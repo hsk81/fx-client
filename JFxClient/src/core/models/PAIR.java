@@ -1,5 +1,12 @@
 package core.models;
 
+import core.exceptions.*;
+import java.util.Date;
+
+import org.zeromq.ZMQ;
+import org.zeromq.ZMQ.Context;
+import org.zeromq.ZMQ.Socket;
+
 public class PAIR implements Cloneable {
 
     private String base = null;
@@ -69,13 +76,42 @@ public class PAIR implements Cloneable {
         return this.getPair().hashCode();
     }
 
-    public boolean isHalted()
+    /**
+     * @TODO: Refactor ZQM context (and REQ socket?) away!
+     */
+    public boolean isHalted() throws ServerException, MessageException
     {
-        //
-        // TODO: Implement access to server using ZMQ!
-        //
+        Context context = ZMQ.context(1);
 
-        throw new UnsupportedOperationException();
+        Socket req = context.socket(ZMQ.REQ);
+        req.connect("tcp://localhost:6666");
+
+        String pattern = "PAIR|get_halted|%s";
+        String message = String.format(pattern, this.getPair());
+
+        req.send(message.getBytes(), 0);
+        byte[] bytes = req.recv(0);
+        String reply = new String(bytes);
+
+        req.close();
+        context.term();
+
+        if (reply.compareTo(message + "|True") == 0)
+        {
+            return true;
+        }
+        else if (reply.compareTo(message + "|False") == 0)
+        {
+            return false;
+        }
+        else if (reply.startsWith("EXCEPTION"))
+        {
+            throw new ServerException(reply);
+        }
+        else
+        {
+            throw new MessageException(reply);
+        }
     }
 
     public void setBase(String base)
@@ -101,17 +137,23 @@ public class PAIR implements Cloneable {
         return this.getPair();
     }
 
-    public static void main(String[] args)
+    public static void main(String[] args) throws Exception
     {
+        String path = System.getProperty("java.library.path");
+        System.out.println(path);
+        
         PAIR usd2eur = new PAIR("USD","EUR");
         PAIR eur2chf = new PAIR("EUR","CHF");
         PAIR chf2usd = new PAIR("CHF","USD");
 
-        System.out.println(String.format("%s: %s", usd2eur.getPair(),
-            usd2eur.isHalted() ? "halted" : "active"));
-        System.out.println(String.format("%s: %s", eur2chf.getPair(),
-            eur2chf.isHalted() ? "halted" : "active"));
-        System.out.println(String.format("%s: %s", chf2usd.getPair(),
-            chf2usd.isHalted() ? "halted" : "active"));
+        while (true)
+        {
+            System.out.println(String.format("[%s] %s: %s", System.currentTimeMillis(),
+                usd2eur.getPair(), usd2eur.isHalted() ? "halted" : "active"));
+            System.out.println(String.format("[%s] %s: %s", System.currentTimeMillis(),
+                eur2chf.getPair(), eur2chf.isHalted() ? "halted" : "active"));
+            System.out.println(String.format("[%s] %s: %s", System.currentTimeMillis(),
+                chf2usd.getPair(), chf2usd.isHalted() ? "halted" : "active"));
+        }
     }
 }
