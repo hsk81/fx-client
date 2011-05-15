@@ -71,7 +71,11 @@ public class PAIR implements Cloneable {
 
     public boolean isHalted()
     {
-        return false;
+        //
+        // TODO: Implement access to server using ZMQ!
+        //
+
+        throw new UnsupportedOperationException();
     }
 
     public void setBase(String base)
