@@ -1,7 +1,6 @@
 package core.models;
 
 import core.exceptions.*;
-import java.util.Date;
 
 import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Context;
@@ -12,9 +11,7 @@ public class PAIR implements Cloneable {
     private String base = null;
     private String quote = null;
 
-    public PAIR()
-    {
-    }
+    public PAIR() { }
 
     public PAIR(String pair)
     {
@@ -44,10 +41,8 @@ public class PAIR implements Cloneable {
         if (object == null) return false;
         if (object == this) return true;
         if (this.getClass() != object.getClass()) return false;
-        PAIR pair = (PAIR)object;
 
-        return this.getBase().compareTo(pair.getBase()) == 0 &&
-               this.getQuote().compareTo(pair.getQuote()) == 0;
+        return this.compareTo((PAIR)object) == 0;
     }
 
     public String getBase()
