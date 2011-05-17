@@ -91,13 +91,9 @@ public class PAIR implements Cloneable {
         req.close();
         context.term();
 
-        if (reply.compareTo(message + "|True") == 0)
+        if (reply.startsWith(message))
         {
-            return true;
-        }
-        else if (reply.compareTo(message + "|False") == 0)
-        {
-            return false;
+            return reply.compareTo(message + "|True") == 0;
         }
         else if (reply.startsWith("EXCEPTION"))
         {
@@ -134,21 +130,23 @@ public class PAIR implements Cloneable {
 
     public static void main(String[] args) throws Exception
     {
-        String path = System.getProperty("java.library.path");
-        System.out.println(path);
-        
         PAIR usd2eur = new PAIR("USD","EUR");
         PAIR eur2chf = new PAIR("EUR","CHF");
         PAIR chf2usd = new PAIR("CHF","USD");
 
         while (true)
         {
-            System.out.println(String.format("[%s] %s: %s", System.currentTimeMillis(),
-                usd2eur.getPair(), usd2eur.isHalted() ? "halted" : "active"));
-            System.out.println(String.format("[%s] %s: %s", System.currentTimeMillis(),
-                eur2chf.getPair(), eur2chf.isHalted() ? "halted" : "active"));
-            System.out.println(String.format("[%s] %s: %s", System.currentTimeMillis(),
-                chf2usd.getPair(), chf2usd.isHalted() ? "halted" : "active"));
+            System.out.println(String.format("[%s] %s: %s", System.nanoTime(),
+                usd2eur.getPair(), usd2eur.isHalted() ? "halted" : "active"
+            ));
+
+            System.out.println(String.format("[%s] %s: %s", System.nanoTime(),
+                eur2chf.getPair(), eur2chf.isHalted() ? "halted" : "active"
+            ));
+
+            System.out.println(String.format("[%s] %s: %s", System.nanoTime(),
+                chf2usd.getPair(), chf2usd.isHalted() ? "halted" : "active"
+            ));
         }
     }
 }

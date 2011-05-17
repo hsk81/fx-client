@@ -61,10 +61,10 @@ public class TICK implements Cloneable {
     }
 
     @Override
-    public String toString()
+    public String toString()    
     {
         return String.format(
-            "[%.6f,%.6f] @ %s", this.bid, this.ask, this.timestamp
+            "[%.6f,%.6f] @ %d", this.bid, this.ask, this.timestamp
         );
     }
 }
