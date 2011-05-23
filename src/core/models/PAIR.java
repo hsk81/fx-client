@@ -6,6 +6,8 @@ import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Context;
 import org.zeromq.ZMQ.Socket;
 
+import java.util.logging.*;
+
 public class PAIR implements Cloneable {
 
     private String base = null;
@@ -71,13 +73,13 @@ public class PAIR implements Cloneable {
         return this.getPair().hashCode();
     }
 
-    /**
-     * @TODO: Refactor ZQM context (and REQ socket?) away!
-     */
-    public boolean isHalted() throws ServerException, MessageException
+    public boolean isHalted() throws RateTableException
     {
-        Context context = ZMQ.context(1);
+        /**
+         * @TODO: Refactor ZQM context (and REQ socket?) away!
+         */
 
+        Context context = ZMQ.context(1);
         Socket req = context.socket(ZMQ.REQ);
         req.connect("tcp://localhost:6666");
 
@@ -93,15 +95,25 @@ public class PAIR implements Cloneable {
 
         if (reply.startsWith(message))
         {
-            return reply.compareTo(message + "|True") == 0;
-        }
-        else if (reply.startsWith("EXCEPTION"))
-        {
-            throw new ServerException(reply);
+            String[] array = reply.split("\\|");
+            return array[array.length - 1].compareTo("True") == 0;
         }
         else
         {
-            throw new MessageException(reply);
+            if (reply.startsWith("EXCEPTION"))
+            {
+                Logger.getLogger(PAIR.class.getName()).log(
+                    Level.SEVERE, null, new ServerException(reply)
+                );
+            }
+            else
+            {
+                Logger.getLogger(PAIR.class.getName()).log(
+                    Level.SEVERE, null, new MessageException(reply)
+                );
+            }
+
+            throw new RateTableException(reply);
         }
     }
 

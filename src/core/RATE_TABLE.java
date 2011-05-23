@@ -1,6 +1,8 @@
 package core;
 
+import java.net.*;
 import java.util.*;
+import java.util.logging.*;
 
 import core.models.*;
 import core.exceptions.*;
@@ -27,10 +29,13 @@ public class RATE_TABLE {
         throw new UnsupportedOperationException();
     }
 
-    public TICK getRate(PAIR pair) throws ServerException, MessageException
+    public TICK getRate(PAIR pair) throws RateTableException
     {
-        Context context = ZMQ.context(1);
+        /**
+         * @TODO: Refactor ZQM context (and REQ socket?) away!
+         */
 
+        Context context = ZMQ.context(1);
         Socket req = context.socket(ZMQ.REQ);
         req.connect("tcp://localhost:6666");
 
@@ -48,17 +53,27 @@ public class RATE_TABLE {
         {
             String[] array = reply.split("\\|");
             
-            return new TICK(Long.parseLong(array[3]),
-                Double.parseDouble(array[4]), Double.parseDouble(array[5])
+            return new TICK(Long.parseLong(array[array.length - 3]),
+                Double.parseDouble(array[array.length - 2]),
+                Double.parseDouble(array[array.length - 1])
             );
-        }
-        else if (reply.startsWith("EXCEPTION"))
-        {
-            throw new ServerException(reply);
         }
         else
         {
-            throw new MessageException(reply);
+            if (reply.startsWith("EXCEPTION"))
+            {
+                Logger.getLogger(RATE_TABLE.class.getName()).log(
+                    Level.SEVERE, null, new ServerException(reply)
+                );
+            }
+            else
+            {
+                Logger.getLogger(RATE_TABLE.class.getName()).log(
+                    Level.SEVERE, null, new MessageException(reply)
+                );
+            }
+
+            throw new RateTableException(reply);
         }
     }
     
@@ -69,7 +84,56 @@ public class RATE_TABLE {
 
     public boolean loggedIn()
     {
-        throw new UnsupportedOperationException();
+        InetAddress ip = null;
+
+        try {
+            ip = InetAddress.getLocalHost();
+        } catch (UnknownHostException ex) {
+            Logger.getLogger(RATE_TABLE.class.getName()).log(
+                Level.SEVERE, null, ex
+            );
+        }
+
+        /**
+         * @TODO: Refactor ZQM context (and REQ socket?) away!
+         */
+        
+        Context context = ZMQ.context(1);
+        Socket req = context.socket(ZMQ.REQ);
+        req.connect("tcp://localhost:6666");
+
+        String pattern = "RATE_TABLE|logged_in|%s";
+        String message = String.format(pattern, ip.getHostAddress());
+
+        req.send(message.getBytes(), 0);
+        byte[] bytes = req.recv(0);
+        String reply = new String(bytes);
+
+        req.close();
+        context.term();
+
+        if (reply.startsWith(message))
+        {
+            String[] array = reply.split("\\|");
+            return array[array.length - 1].compareTo("True") == 0;
+        }
+        else
+        {
+            if (reply.startsWith("EXCEPTION"))
+            {
+                Logger.getLogger(RATE_TABLE.class.getName()).log(
+                    Level.SEVERE, null, new ServerException(reply)
+                );
+            }
+            else
+            {
+                Logger.getLogger(RATE_TABLE.class.getName()).log(
+                    Level.SEVERE, null, new MessageException(reply)
+                );
+            }
+        }
+
+        return false;
     }
 
     public static void main(String[] args) throws Exception
@@ -80,7 +144,7 @@ public class RATE_TABLE {
         PAIR eur2chf = new PAIR("EUR","CHF");
         PAIR chf2usd = new PAIR("CHF","USD");
 
-        while (true)
+        while (rateTable.loggedIn())
         {
             System.out.println(String.format("[%s] %s: %s", System.nanoTime(),
                 usd2eur.getPair(), rateTable.getRate (usd2eur)
