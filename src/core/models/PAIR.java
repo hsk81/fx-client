@@ -73,7 +73,7 @@ public class PAIR implements Cloneable {
         return this.getPair().hashCode();
     }
 
-    public boolean isHalted() throws RateTableException
+    public boolean isHalted()
     {
         /**
          * @TODO: Refactor ZQM context (and REQ socket?) away!
@@ -83,8 +83,8 @@ public class PAIR implements Cloneable {
         Socket req = context.socket(ZMQ.REQ);
         req.connect("tcp://localhost:6666");
 
-        String pattern = "PAIR|get_halted|%s";
-        String message = String.format(pattern, this.getPair());
+        String pattern = "PAIR|get_halted|%s|%s";
+        String message = String.format(pattern, this.quote, this.base);
 
         req.send(message.getBytes(), 0);
         byte[] bytes = req.recv(0);
@@ -113,7 +113,12 @@ public class PAIR implements Cloneable {
                 );
             }
 
-            throw new RateTableException(reply);
+            /**
+             * @TODO: Appareantly all pairs are prefetched somewhere and here
+             *        only the cached pairs are returned. Implement!
+             */
+            
+            return true;
         }
     }
 
