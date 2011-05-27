@@ -1,12 +1,8 @@
 package core.models;
 
-import core.exceptions.*;
-
-import org.zeromq.ZMQ;
-import org.zeromq.ZMQ.Context;
-import org.zeromq.ZMQ.Socket;
-
 import java.util.logging.*;
+import core.exceptions.*;
+import utils.*;
 
 public class PAIR implements Cloneable {
 
@@ -73,25 +69,17 @@ public class PAIR implements Cloneable {
         return this.getPair().hashCode();
     }
 
+    private static final String get_halted = "PAIR|get_halted|%s|%s";
+    private static final String[] get_halted_arr = get_halted.split("\\|");
+    private static final int get_halted_sz = get_halted_arr.length;
+
     public boolean isHalted()
     {
-        /**
-         * @TODO: Refactor ZQM context (and REQ socket?) away!
-         */
+        String message = String.format(get_halted, this.quote, this.base);
 
-        Context context = ZMQ.context(1);
-        Socket req = context.socket(ZMQ.REQ);
-        req.connect("tcp://localhost:6666");
-
-        String pattern = "PAIR|get_halted|%s|%s";
-        String message = String.format(pattern, this.quote, this.base);
-
-        req.send(message.getBytes(), 0);
-        byte[] bytes = req.recv(0);
+        MQManager.singleton.req.send(message.getBytes(), 0);
+        byte[] bytes = MQManager.singleton.req.recv(0);
         String reply = new String(bytes);
-
-        req.close();
-        context.term();
 
         if (reply.startsWith(message))
         {

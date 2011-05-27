@@ -6,10 +6,7 @@ import java.util.logging.*;
 
 import core.models.*;
 import core.exceptions.*;
-
-import org.zeromq.ZMQ;
-import org.zeromq.ZMQ.Context;
-import org.zeromq.ZMQ.Socket;
+import utils.*;
 
 public class RATE_TABLE {
     
@@ -18,38 +15,29 @@ public class RATE_TABLE {
         throw new UnsupportedOperationException();
     }
 
+    private static final String get_history = "RATE_TABLE|get_history|%s|%s|%s|%s";
+    private static final String[] get_history_arr = get_history.split("\\|");
+    private static final int get_history_sz = get_history_arr.length;
+    
     public Vector<HISTORY_POINT> getHistory(
         PAIR pair, long interval, int numTicks
     )
         throws FxException
     {
-        /**
-         * @TODO: Refactor ZQM context (and REQ socket?) away!
-         */
-
-        Context context = ZMQ.context(1);
-        Socket req = context.socket(ZMQ.REQ);
-        req.connect("tcp://localhost:6666");
-
-        String pattern = "RATE_TABLE|get_history|%s|%s|%s|%s";
-        String message = String.format(pattern, 
-            pair.getQuote(), pair.getBase(), interval, numTicks
+        String message = String.format(
+            get_history, pair.getQuote(), pair.getBase(), interval, numTicks
         );
 
-        req.send(message.getBytes(), 0);
-        byte[] bytes = req.recv(0);
+        MQManager.singleton.req.send(message.getBytes(), 0);
+        byte[] bytes = MQManager.singleton.req.recv(0);
         String reply = new String(bytes);
-
-        req.close();
-        context.term();
         
         if (reply.startsWith(message))
         {
-            String[] prefix = pattern.split("\\|");
             String[] array = reply.split("\\|");
 
             Vector<HISTORY_POINT> historyPoints = new Vector<HISTORY_POINT>();
-            for(int idx = prefix.length; idx < array.length; idx += 9)
+            for(int idx = get_history_sz; idx < array.length; idx += 9)
             {
                 historyPoints.add(new HISTORY_POINT(
                     Long.parseLong(array[idx]),
@@ -121,27 +109,19 @@ public class RATE_TABLE {
         return minMaxPoints;
     }
 
+    private static final String get_rate = "RATE_TABLE|get_rate|%s|%s";
+    private static final String[] get_rate_arr = get_rate.split("\\|");
+    private static final int get_rate_sz = get_rate_arr.length;
+
     public TICK getRate(PAIR pair) throws RateTableException
     {
-        /**
-         * @TODO: Refactor ZQM context (and REQ socket?) away!
-         */
-
-        Context context = ZMQ.context(1);
-        Socket req = context.socket(ZMQ.REQ);
-        req.connect("tcp://localhost:6666");
-
-        String pattern = "RATE_TABLE|get_rate|%s|%s";
-        String message = String.format(pattern,
-            pair.getQuote(), pair.getBase()
+        String message = String.format(
+            get_rate, pair.getQuote(), pair.getBase()
         );
 
-        req.send(message.getBytes(), 0);
-        byte[] bytes = req.recv(0);
+        MQManager.singleton.req.send(message.getBytes(), 0);
+        byte[] bytes = MQManager.singleton.req.recv(0);
         String reply = new String(bytes);
-
-        req.close();
-        context.term();
 
         if (reply.startsWith(message))
         {
@@ -171,6 +151,10 @@ public class RATE_TABLE {
         }
     }
     
+    private static final String logged_in = "RATE_TABLE|logged_in|%s";
+    private static final String[] logged_in_arr = logged_in.split("\\|");
+    private static final int logged_in_sz = logged_in_arr.length;
+
     public boolean loggedIn()
     {
         InetAddress ip = null;
@@ -183,23 +167,11 @@ public class RATE_TABLE {
             );
         }
 
-        /**
-         * @TODO: Refactor ZQM context (and REQ socket?) away!
-         */
+        String message = String.format(logged_in, ip.getHostAddress());
         
-        Context context = ZMQ.context(1);
-        Socket req = context.socket(ZMQ.REQ);
-        req.connect("tcp://localhost:6666");
-
-        String pattern = "RATE_TABLE|logged_in|%s";
-        String message = String.format(pattern, ip.getHostAddress());
-
-        req.send(message.getBytes(), 0);
-        byte[] bytes = req.recv(0);
+        MQManager.singleton.req.send(message.getBytes(), 0);
+        byte[] bytes = MQManager.singleton.req.recv(0);
         String reply = new String(bytes);
-
-        req.close();
-        context.term();
 
         if (reply.startsWith(message))
         {
