@@ -2,7 +2,7 @@ package core.models;
 
 import java.util.logging.*;
 import core.exceptions.*;
-import utils.*;
+import core.utils.*;
 
 public class PAIR implements Cloneable {
 

@@ -7,7 +7,7 @@ import java.util.logging.*;
 import core.models.*;
 import core.models.utils.*;
 import core.exceptions.*;
-import utils.*;
+import core.utils.*;
 
 public class RATE_TABLE {
     
