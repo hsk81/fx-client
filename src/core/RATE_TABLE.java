@@ -5,6 +5,7 @@ import java.util.*;
 import java.util.logging.*;
 
 import core.models.*;
+import core.models.utils.*;
 import core.exceptions.*;
 import utils.*;
 
@@ -219,16 +220,39 @@ public class RATE_TABLE {
         TICK tick = rateTable.getRate(pair);
 
         System.out.println(String.format("[%s] %s: %s",
-                System.nanoTime(), pair.getPair(), tick
+            System.nanoTime(), pair.getPair(), tick
         ));
 
-        Vector<HISTORY_POINT> history = rateTable.getHistory(
-            pair, tick.getTimestamp(), 1
+        // history
+        Vector<HISTORY_POINT> historyPoints = rateTable.getHistory(
+            pair, 1000, 900 // 1sec interval for 15mins
         );
 
-        for (HISTORY_POINT historyPoint : history) {
+        for (HISTORY_POINT historyPoint : historyPoints) {
             System.out.println(String.format("[%s] %s",
                 System.nanoTime(), historyPoint
+            ));
+        }
+
+        // candles
+        Vector<CANDLE_POINT> candlePoints = rateTable.getCandles(
+            pair, 1000, 900 // 1sec interval for 15mins
+        );
+
+        for (CANDLE_POINT candlePoint : candlePoints) {
+            System.out.println(String.format("[%s] %s",
+                System.nanoTime(), candlePoint
+            ));
+        }
+
+        // min-max points
+        Vector<MIN_MAX_POINT> maxMaxPoints = rateTable.getMinMaxs(
+            pair, 1000, 900 // 1sec interval for 15mins
+        );
+
+        for (MIN_MAX_POINT maxMaxPoint : maxMaxPoints) {
+            System.out.println(String.format("[%s] %s",
+                System.nanoTime(), maxMaxPoint
             ));
         }
     }

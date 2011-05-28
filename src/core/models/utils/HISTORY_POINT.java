@@ -1,4 +1,4 @@
-package core;
+package core.models.utils;
 
 import core.models.*;
 
@@ -102,10 +102,10 @@ public class HISTORY_POINT implements Cloneable {
             return this.candlePoint;
         } else {
             return this.candlePoint = new CANDLE_POINT(this.timestamp,
-                this.open.getMean(), //TODO: Verify open!
-                this.close.getMean(), //TODO: Verify close!
-                this.min.getMean(), //TODO: Verify min!
-                this.max.getMean() //TODO: Verify max!
+                (this.openBid + this.openAsk) * 0.5,
+                (this.closeBid + this.closeAsk) * 0.5,
+                (this.minBid + this.minAsk) * 0.5,
+                (this.maxBid + this.maxAsk) * 0.5
             );
         }
     }
@@ -117,8 +117,8 @@ public class HISTORY_POINT implements Cloneable {
             return this.minMaxPoint;
         } else {
             return this.minMaxPoint = new MIN_MAX_POINT(this.timestamp,
-                this.min.getMean(), //TODO: Verify min!
-                this.max.getMean() //TODO: Verify max!
+                (this.minBid + this.minAsk) * 0.5,
+                (this.maxBid + this.maxAsk) * 0.5
             );
         }
     }

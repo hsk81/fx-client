@@ -1,4 +1,4 @@
-package core;
+package core.models.utils;
 
 public class MIN_MAX_POINT implements Cloneable {
 
