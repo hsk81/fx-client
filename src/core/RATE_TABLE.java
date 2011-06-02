@@ -221,7 +221,7 @@ public class RATE_TABLE {
 
         System.out.println(String.format("[%s] %s: %s",
             System.nanoTime(), pair.getPair(), tick
-        ));
+        ));/*
 
         //history
         Vector<HISTORY_POINT> historyPoints = rateTable.getHistory(
@@ -254,6 +254,6 @@ public class RATE_TABLE {
             System.out.println(String.format("[%s] %s",
                 System.nanoTime(), maxMaxPoint
             ));
-        }
+        }*/
     }
 }
