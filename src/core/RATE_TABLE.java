@@ -204,13 +204,13 @@ public class RATE_TABLE {
 
         PAIR eur2usd = new PAIR("USD","EUR");
         PAIR usd2chf = new PAIR("CHF","USD");
-      //PAIR chf2eur = new PAIR("EUR","CHF");
+        PAIR chf2eur = new PAIR("EUR","CHF");
 
         while (rateTable.loggedIn())
         {
             dump(rateTable, eur2usd);
             dump(rateTable, usd2chf);
-          //dump(rateTable, chf2eur);
+            dump(rateTable, chf2eur);
         }
     }
 
@@ -223,37 +223,37 @@ public class RATE_TABLE {
             System.nanoTime(), pair.getPair(), tick
         ));
 
-        //history
-        Vector<HISTORY_POINT> historyPoints = rateTable.getHistory(
-            pair, 1000, 15 // 1sec interval for 15 ticks
-        );
-        
-        for (HISTORY_POINT historyPoint : historyPoints) {
-            System.out.println(String.format("[%s] %s",
-                System.nanoTime(), historyPoint
-            ));
-        }
-
-        //candles
-        Vector<CANDLE_POINT> candlePoints = rateTable.getCandles(
-            pair, 1000, 15 // 1sec interval for 15 ticks
-        );
-        
-        for (CANDLE_POINT candlePoint : candlePoints) {
-            System.out.println(String.format("[%s] %s",
-                System.nanoTime(), candlePoint
-            ));
-        }
-
-        //min-max points
-        Vector<MIN_MAX_POINT> maxMaxPoints = rateTable.getMinMaxs(
-            pair, 1000, 15 // 1sec interval for 15 ticks
-        );
-        
-        for (MIN_MAX_POINT maxMaxPoint : maxMaxPoints) {
-            System.out.println(String.format("[%s] %s",
-                System.nanoTime(), maxMaxPoint
-            ));
-        }
+//        //history
+//        Vector<HISTORY_POINT> historyPoints = rateTable.getHistory(
+//            pair, 1000, 15 // 1sec interval for 15 ticks
+//        );
+//
+//        for (HISTORY_POINT historyPoint : historyPoints) {
+//            System.out.println(String.format("[%s] %s",
+//                System.nanoTime(), historyPoint
+//            ));
+//        }
+//
+//        //candles
+//        Vector<CANDLE_POINT> candlePoints = rateTable.getCandles(
+//            pair, 1000, 15 // 1sec interval for 15 ticks
+//        );
+//
+//        for (CANDLE_POINT candlePoint : candlePoints) {
+//            System.out.println(String.format("[%s] %s",
+//                System.nanoTime(), candlePoint
+//            ));
+//        }
+//
+//        //min-max points
+//        Vector<MIN_MAX_POINT> maxMaxPoints = rateTable.getMinMaxs(
+//            pair, 1000, 15 // 1sec interval for 15 ticks
+//        );
+//
+//        for (MIN_MAX_POINT maxMaxPoint : maxMaxPoints) {
+//            System.out.println(String.format("[%s] %s",
+//                System.nanoTime(), maxMaxPoint
+//            ));
+//        }
     }
 }
