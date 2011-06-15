@@ -4,16 +4,24 @@ import java.net.*;
 import java.util.*;
 import java.util.logging.*;
 
-import core.models.*;
 import core.models.utils.*;
 import core.exceptions.*;
+import core.models.*;
 import core.utils.*;
 
 public class RATE_TABLE {
-    
+
+    private RATE_EVENT_MANAGER eventManager = null;
     public EVENT_MANAGER getEventManager()
     {
-        throw new UnsupportedOperationException();
+        if (this.eventManager != null)
+        {
+            return this.eventManager;
+        }
+        else
+        {
+            return this.eventManager = new RATE_EVENT_MANAGER();
+        }
     }
 
     private static final String get_history = "RATE_TABLE|get_history|%s|%s|%s|%s";
@@ -223,37 +231,37 @@ public class RATE_TABLE {
             System.nanoTime(), pair.getPair(), tick
         ));
 
-//        //history
-//        Vector<HISTORY_POINT> historyPoints = rateTable.getHistory(
-//            pair, 1000, 15 // 1sec interval for 15 ticks
-//        );
-//
-//        for (HISTORY_POINT historyPoint : historyPoints) {
-//            System.out.println(String.format("[%s] %s",
-//                System.nanoTime(), historyPoint
-//            ));
-//        }
-//
-//        //candles
-//        Vector<CANDLE_POINT> candlePoints = rateTable.getCandles(
-//            pair, 1000, 15 // 1sec interval for 15 ticks
-//        );
-//
-//        for (CANDLE_POINT candlePoint : candlePoints) {
-//            System.out.println(String.format("[%s] %s",
-//                System.nanoTime(), candlePoint
-//            ));
-//        }
-//
-//        //min-max points
-//        Vector<MIN_MAX_POINT> maxMaxPoints = rateTable.getMinMaxs(
-//            pair, 1000, 15 // 1sec interval for 15 ticks
-//        );
-//
-//        for (MIN_MAX_POINT maxMaxPoint : maxMaxPoints) {
-//            System.out.println(String.format("[%s] %s",
-//                System.nanoTime(), maxMaxPoint
-//            ));
-//        }
+        //history
+        Vector<HISTORY_POINT> historyPoints = rateTable.getHistory(
+            pair, 1000, 15 // 1sec interval for 15 ticks
+        );
+
+        for (HISTORY_POINT historyPoint : historyPoints) {
+            System.out.println(String.format("[%s] %s",
+                System.nanoTime(), historyPoint
+            ));
+        }
+
+        //candles
+        Vector<CANDLE_POINT> candlePoints = rateTable.getCandles(
+            pair, 1000, 15 // 1sec interval for 15 ticks
+        );
+
+        for (CANDLE_POINT candlePoint : candlePoints) {
+            System.out.println(String.format("[%s] %s",
+                System.nanoTime(), candlePoint
+            ));
+        }
+
+        //min-max points
+        Vector<MIN_MAX_POINT> maxMaxPoints = rateTable.getMinMaxs(
+            pair, 1000, 15 // 1sec interval for 15 ticks
+        );
+
+        for (MIN_MAX_POINT maxMaxPoint : maxMaxPoints) {
+            System.out.println(String.format("[%s] %s",
+                System.nanoTime(), maxMaxPoint
+            ));
+        }
     }
 }
