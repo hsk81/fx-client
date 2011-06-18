@@ -228,7 +228,7 @@ public class RATE_TABLE {
         TICK tick = rateTable.getRate(pair);
 
         System.out.println(String.format("[%s] %s: %s",
-            System.nanoTime(), pair.getPair(), tick
+            System.nanoTime(), pair.toString(), tick
         ));
 
         //history

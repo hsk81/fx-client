@@ -1,30 +1,45 @@
 package core;
 
+import core.models.*;
+
 public abstract class RATE_EVENT extends EVENT {
+
+    protected PAIR pair = null;
 
     public RATE_EVENT()
     {
-        throw new UnsupportedOperationException();
+        super();
     }
 
     public RATE_EVENT(boolean transientFlag)
     {
-        throw new UnsupportedOperationException();
+        super(transientFlag);
     }
 
     public RATE_EVENT(String key)
     {
-        throw new UnsupportedOperationException();
+        this.pair = new PAIR(key);
     }
 
     public RATE_EVENT(String key, boolean transientFlag)
     {
-        throw new UnsupportedOperationException();
+        this.pair = new PAIR(key);
+        this.transientFlag = transientFlag;
     }
 
     @Override
     public boolean match(EVENT_INFO ei) {
-        throw new UnsupportedOperationException();
+
+        if (ei != null && ei.getClass() != RATE_EVENT_INFO.class)
+        {
+            return this.pair == null || this.pair.equals(
+                ((RATE_EVENT_INFO)ei).getPair()
+            );
+        }
+        else
+        {
+            return false;
+        }
     }
 
     @Override

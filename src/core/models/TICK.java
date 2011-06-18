@@ -24,15 +24,25 @@ public class TICK implements Cloneable {
     @Override
     public boolean equals(Object object)
     {
-        if (object == null) return false;
-        if (object == this) return true;
-        if (this.getClass() != object.getClass()) return false;
-        
-        TICK tick = (TICK)object;
-
-        return this.timestamp == tick.timestamp &&
-               this.bid == tick.bid &&
-               this.ask == tick.ask;
+        if (this != object)
+        {
+            if (object instanceof TICK)
+            {
+                TICK tick = (TICK)object; return
+                    
+                    this.timestamp == tick.timestamp &&
+                    this.bid == tick.bid &&
+                    this.ask == tick.ask;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else
+        {
+            return true;
+        }
     }
 
     public TICK getInverse()

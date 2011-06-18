@@ -30,22 +30,44 @@ public class PAIR implements Cloneable {
 
     public int compareTo(PAIR pair)
     {
-        return this.getPair().compareTo(pair.getPair());
+        return this.toString().compareTo(pair.toString());
     }
 
     @Override
     public boolean equals(Object object)
     {
-        if (object == null) return false;
-        if (object == this) return true;
-        if (this.getClass() != object.getClass()) return false;
-
-        return this.compareTo((PAIR)object) == 0;
+        if (this != object)
+        {
+            if (object instanceof PAIR)
+            {
+                return this.compareTo((PAIR)object) == 0;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else
+        {
+            return true;
+        }
     }
 
-    public String getBase()
+    public String getBase() { return this.base; }
+    public void setBase(String base) { this.base = base; }
+
+    public String getQuote() { return this.quote; }
+    public void setQuote(String quote) { this.quote = quote; }
+
+    public String getPair()
     {
-        return this.base;
+        return this.toString();
+    }
+    public final void setPair(String pair)
+    {
+        String[] splits = pair.split("/");
+        this.base = splits[0];
+        this.quote = splits[1];
     }
 
     public PAIR getInverse()
@@ -53,20 +75,10 @@ public class PAIR implements Cloneable {
         return new PAIR(this.quote, this.base);
     }
 
-    public String getPair()
-    {
-        return String.format("%s/%s", this.quote, this.base);
-    }
-
-    public String getQuote()
-    {
-        return this.quote;
-    }
-
     @Override
     public int hashCode()
     {
-        return this.getPair().hashCode();
+        return this.toString().hashCode();
     }
 
     private static final String get_halted = "PAIR|get_halted|%s|%s";
@@ -110,27 +122,10 @@ public class PAIR implements Cloneable {
         }
     }
 
-    public void setBase(String base)
-    {
-        this.base = base;
-    }
-
-    public final void setPair(String pair)
-    {
-        String[] splits = pair.split("/");
-        this.base = splits[0];
-        this.quote = splits[1];
-    }
-
-    public void setQuote(String quote)
-    {
-        this.quote = quote;
-    }
-
     @Override
     public String toString()
     {
-        return this.getPair();
+        return String.format("%s/%s", this.quote, this.base);
     }
 
     public static void main(String[] args) throws Exception
@@ -142,15 +137,15 @@ public class PAIR implements Cloneable {
         while (true)
         {
             System.out.println(String.format("[%s] %s: %s", System.nanoTime(),
-                usd2eur.getPair(), usd2eur.isHalted() ? "halted" : "active"
+                usd2eur.toString(), usd2eur.isHalted() ? "halted" : "active"
             ));
 
             System.out.println(String.format("[%s] %s: %s", System.nanoTime(),
-                eur2chf.getPair(), eur2chf.isHalted() ? "halted" : "active"
+                eur2chf.toString(), eur2chf.isHalted() ? "halted" : "active"
             ));
 
             System.out.println(String.format("[%s] %s: %s", System.nanoTime(),
-                chf2usd.getPair(), chf2usd.isHalted() ? "halted" : "active"
+                chf2usd.toString(), chf2usd.isHalted() ? "halted" : "active"
             ));
         }
     }

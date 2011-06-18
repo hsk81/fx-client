@@ -4,9 +4,9 @@ public abstract class EVENT_INFO {
 
     public EVENT_INFO()
     {
-        throw new UnsupportedOperationException();
+        // pass
     }
 
-    public abstract int compareTo(Object other);
+    public abstract int compareTo(Object object);
     public abstract long getTimestamp();
 }

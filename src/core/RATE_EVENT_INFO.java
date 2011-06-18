@@ -2,28 +2,44 @@ package core;
 
 import core.models.*;
 
-public final class RATE_EVENT_INFO extends EVENT_INFO   {
+public final class RATE_EVENT_INFO extends EVENT_INFO {
 
-    @Override
-    public int compareTo(Object other)
+    protected PAIR pair = null;
+    protected TICK tick = null;
+
+    public RATE_EVENT_INFO(PAIR pair, TICK tick)
     {
-        throw new UnsupportedOperationException();
+        this.pair = pair;
+        this.tick = tick;
+    }
+
+    public PAIR getPair()
+    {
+        return this.pair;
+    }
+
+    public TICK getTick()
+    {
+        return this.tick;
     }
 
     @Override
     public long getTimestamp()
     {
-        throw new UnsupportedOperationException();
+        return this.getTick().getTimestamp();
     }
 
     @Override
-    public boolean equals(Object other)
+    public boolean equals(Object object)
     {
-        if (this != other)
+        if (this != object)
         {
-            if (other instanceof RATE_EVENT_INFO)
+            if (object instanceof RATE_EVENT_INFO)
             {
-                throw new UnsupportedOperationException();
+                RATE_EVENT_INFO rai = (RATE_EVENT_INFO)object; return
+                    
+                    this.getPair().equals(rai.getPair()) &&
+                    this.getTick().equals(rai.getTick());
             }
             else
             {
@@ -39,16 +55,41 @@ public final class RATE_EVENT_INFO extends EVENT_INFO   {
     @Override
     public int hashCode()
     {
-        throw new UnsupportedOperationException();
+        return String.format(
+            "{0} {1}", this.getPair().toString(), this.getTick().toString()
+        ).hashCode();
     }
 
-    public PAIR getPair()
+    @Override
+    public int compareTo(Object object)
     {
-        throw new UnsupportedOperationException();
-    }
+        if (this != object)
+        {
+            if (object instanceof RATE_EVENT_INFO)
+            {
+                RATE_EVENT_INFO that = (RATE_EVENT_INFO)object;
+                long this_dts = this.getTimestamp();
+                long that_dts = that.getTimestamp();
 
-    public TICK getTick()
-    {
-        throw new UnsupportedOperationException();
+                if (this_dts != that_dts)
+                {
+                    return (this_dts > that_dts) ? 1 : -1;
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+            else
+            {
+                throw new ClassCastException(String.format(
+                    "{0} to {1}", object.getClass(), RATE_EVENT_INFO.class
+                ));
+            }
+        }
+        else
+        {
+            return 0;
+        }
     }
 }

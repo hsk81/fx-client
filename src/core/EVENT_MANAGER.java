@@ -4,18 +4,32 @@ import java.util.*;
 
 public abstract class EVENT_MANAGER {
 
-    public boolean add(EVENT e)
+    private Vector<EVENT> events = new Vector<EVENT>();
+
+    protected EVENT_MANAGER()
     {
-        throw new UnsupportedOperationException();
+        // pass
     }
 
     public Vector<EVENT> getEvents()
     {
-        throw new UnsupportedOperationException();
+        return (Vector<EVENT>)this.events.clone();
+    }
+
+    public boolean add(EVENT e)
+    {
+        if (this.events.contains(e) != true)
+        {
+            return this.events.add(e);
+        }
+        else
+        {
+            return false;
+        }
     }
 
     boolean remove(EVENT e)
     {
-        throw new UnsupportedOperationException();
+        return this.events.remove(e);
     }
 }

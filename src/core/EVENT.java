@@ -2,26 +2,34 @@ package core;
 
 public abstract class EVENT {
 
+    protected boolean transientFlag = false;
+
     public EVENT()
     {
-        throw new UnsupportedOperationException();
+        // pass
     }
 
     public EVENT(boolean transientFlag)
     {
-        throw new UnsupportedOperationException();
+        this.transientFlag = transientFlag;
     }
 
     public abstract boolean match(EVENT_INFO ei);
     public abstract void handle(EVENT_INFO ei, EVENT_MANAGER em);
 
+    @Deprecated
     public boolean isTransient()
     {
-        throw new UnsupportedOperationException();
+        return this.transientFlag;
     }
 
-    public void setTransient(boolean t)
+    public boolean getTransient() 
     {
-        throw new UnsupportedOperationException();
+        return this.transientFlag;
+    }
+    
+    public void setTransient(boolean transientFlag)
+    {
+        this.transientFlag = transientFlag;
     }
 }
