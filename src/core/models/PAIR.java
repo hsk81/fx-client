@@ -130,23 +130,20 @@ public class PAIR implements Cloneable {
 
     public static void main(String[] args) throws Exception
     {
-        PAIR usd2eur = new PAIR("USD","EUR");
-        PAIR eur2chf = new PAIR("EUR","CHF");
-        PAIR chf2usd = new PAIR("CHF","USD");
+        PAIR eur2usd = new PAIR("USD","EUR");
+        PAIR usd2chf = new PAIR("CHF","USD");
+        PAIR eur2chf = new PAIR("CHF","EUR");
 
-        while (true)
-        {
-            System.out.println(String.format("[%s] %s: %s", System.nanoTime(),
-                usd2eur.toString(), usd2eur.isHalted() ? "halted" : "active"
-            ));
+        System.out.println(String.format("[%s] %s: %s", System.nanoTime(),
+            eur2usd.toString(), eur2usd.isHalted() ? "halted" : "active"
+        ));
 
-            System.out.println(String.format("[%s] %s: %s", System.nanoTime(),
-                eur2chf.toString(), eur2chf.isHalted() ? "halted" : "active"
-            ));
+        System.out.println(String.format("[%s] %s: %s", System.nanoTime(),
+            eur2chf.toString(), eur2chf.isHalted() ? "halted" : "active"
+        ));
 
-            System.out.println(String.format("[%s] %s: %s", System.nanoTime(),
-                chf2usd.toString(), chf2usd.isHalted() ? "halted" : "active"
-            ));
-        }
+        System.out.println(String.format("[%s] %s: %s", System.nanoTime(),
+            usd2chf.toString(), usd2chf.isHalted() ? "halted" : "active"
+        ));
     }
 }

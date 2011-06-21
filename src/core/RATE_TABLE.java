@@ -212,13 +212,13 @@ public class RATE_TABLE {
 
         PAIR eur2usd = new PAIR("USD","EUR");
         PAIR usd2chf = new PAIR("CHF","USD");
-        PAIR chf2eur = new PAIR("EUR","CHF");
+        PAIR eur2chf = new PAIR("CHF","EUR");
 
-        while (rateTable.loggedIn())
+        //while (rateTable.loggedIn())
         {
             dump(rateTable, eur2usd);
             dump(rateTable, usd2chf);
-            dump(rateTable, chf2eur);
+            dump(rateTable, eur2chf);
         }
     }
 
