@@ -89,8 +89,8 @@ public class PAIR implements Cloneable {
     {
         String message = String.format(get_halted, this.quote, this.base);
 
-        MQManager.singleton.req.send(message.getBytes(), 0);
-        byte[] bytes = MQManager.singleton.req.recv(0);
+        MQ_MANAGER.singleton.req.send(message.getBytes(), 0);
+        byte[] bytes = MQ_MANAGER.singleton.req.recv(0);
         String reply = new String(bytes);
 
         if (reply.startsWith(message))
@@ -103,13 +103,13 @@ public class PAIR implements Cloneable {
             if (reply.startsWith("EXCEPTION"))
             {
                 Logger.getLogger(PAIR.class.getName()).log(
-                    Level.SEVERE, null, new ServerException(reply)
+                    Level.SEVERE, null, new SERVER_EXCEPTION(reply)
                 );
             }
             else
             {
                 Logger.getLogger(PAIR.class.getName()).log(
-                    Level.SEVERE, null, new MessageException(reply)
+                    Level.SEVERE, null, new MESSAGE_EXCEPTION(reply)
                 );
             }
 

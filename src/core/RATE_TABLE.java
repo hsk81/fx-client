@@ -20,7 +20,10 @@ public class RATE_TABLE {
         }
         else
         {
-            return this.eventManager = new RATE_EVENT_MANAGER();
+            this.eventManager = new RATE_EVENT_MANAGER();
+            this.eventManager.start();
+            
+            return this.eventManager;
         }
     }
 
@@ -31,14 +34,14 @@ public class RATE_TABLE {
     public Vector<HISTORY_POINT> getHistory(
         PAIR pair, long interval, int numTicks
     )
-        throws FxException
+        throws FX_EXCEPTION
     {
         String message = String.format(
             get_history, pair.getQuote(), pair.getBase(), interval, numTicks
         );
 
-        MQManager.singleton.req.send(message.getBytes(), 0);
-        byte[] bytes = MQManager.singleton.req.recv(0);
+        MQ_MANAGER.singleton.req.send(message.getBytes(), 0);
+        byte[] bytes = MQ_MANAGER.singleton.req.recv(0);
         String reply = new String(bytes);
         
         if (reply.startsWith(message))
@@ -68,24 +71,24 @@ public class RATE_TABLE {
             if (reply.startsWith("EXCEPTION"))
             {
                 Logger.getLogger(RATE_TABLE.class.getName()).log(
-                    Level.SEVERE, null, new ServerException(reply)
+                    Level.SEVERE, null, new SERVER_EXCEPTION(reply)
                 );
             }
             else
             {
                 Logger.getLogger(RATE_TABLE.class.getName()).log(
-                    Level.SEVERE, null, new MessageException(reply)
+                    Level.SEVERE, null, new MESSAGE_EXCEPTION(reply)
                 );
             }
 
-            throw new FxException(reply);
+            throw new FX_EXCEPTION(reply);
         }
     }
 
     public Vector<CANDLE_POINT> getCandles(
         PAIR pair, long interval, int numTicks
     )
-        throws FxException
+        throws FX_EXCEPTION
     {
         Vector<HISTORY_POINT> historyPoints = this.getHistory(
             pair, interval, numTicks
@@ -103,7 +106,7 @@ public class RATE_TABLE {
     public Vector<MIN_MAX_POINT> getMinMaxs(
         PAIR pair, long interval, int numTicks
     )
-        throws FxException
+        throws FX_EXCEPTION
     {
         Vector<HISTORY_POINT> historyPoints = this.getHistory(
             pair, interval, numTicks
@@ -122,14 +125,14 @@ public class RATE_TABLE {
     private static final String[] get_rate_arr = get_rate.split("\\|");
     private static final int get_rate_sz = get_rate_arr.length;
 
-    public TICK getRate(PAIR pair) throws RateTableException
+    public TICK getRate(PAIR pair) throws RATE_TABLE_EXCEPTION
     {
         String message = String.format(
             get_rate, pair.getQuote(), pair.getBase()
         );
 
-        MQManager.singleton.req.send(message.getBytes(), 0);
-        byte[] bytes = MQManager.singleton.req.recv(0);
+        MQ_MANAGER.singleton.req.send(message.getBytes(), 0);
+        byte[] bytes = MQ_MANAGER.singleton.req.recv(0);
         String reply = new String(bytes);
 
         if (reply.startsWith(message))
@@ -146,17 +149,17 @@ public class RATE_TABLE {
             if (reply.startsWith("EXCEPTION"))
             {
                 Logger.getLogger(RATE_TABLE.class.getName()).log(
-                    Level.SEVERE, null, new ServerException(reply)
+                    Level.SEVERE, null, new SERVER_EXCEPTION(reply)
                 );
             }
             else
             {
                 Logger.getLogger(RATE_TABLE.class.getName()).log(
-                    Level.SEVERE, null, new MessageException(reply)
+                    Level.SEVERE, null, new MESSAGE_EXCEPTION(reply)
                 );
             }
 
-            throw new RateTableException(reply);
+            throw new RATE_TABLE_EXCEPTION(reply);
         }
     }
     
@@ -178,8 +181,8 @@ public class RATE_TABLE {
 
         String message = String.format(logged_in, ip.getHostAddress());
         
-        MQManager.singleton.req.send(message.getBytes(), 0);
-        byte[] bytes = MQManager.singleton.req.recv(0);
+        MQ_MANAGER.singleton.req.send(message.getBytes(), 0);
+        byte[] bytes = MQ_MANAGER.singleton.req.recv(0);
         String reply = new String(bytes);
 
         if (reply.startsWith(message))
@@ -192,13 +195,13 @@ public class RATE_TABLE {
             if (reply.startsWith("EXCEPTION"))
             {
                 Logger.getLogger(RATE_TABLE.class.getName()).log(
-                    Level.SEVERE, null, new ServerException(reply)
+                    Level.SEVERE, null, new SERVER_EXCEPTION(reply)
                 );
             }
             else
             {
                 Logger.getLogger(RATE_TABLE.class.getName()).log(
-                    Level.SEVERE, null, new MessageException(reply)
+                    Level.SEVERE, null, new MESSAGE_EXCEPTION(reply)
                 );
             }
         }
@@ -223,7 +226,7 @@ public class RATE_TABLE {
     }
 
     private static void dump(RATE_TABLE rateTable, PAIR pair)
-        throws RateTableException, FxException
+        throws RATE_TABLE_EXCEPTION, FX_EXCEPTION
     {
         TICK tick = rateTable.getRate(pair);
 

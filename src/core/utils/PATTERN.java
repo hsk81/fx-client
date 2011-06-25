@@ -1,10 +1,10 @@
 package core.utils;
 
-public class Pattern {
+public class PATTERN {
 
     public String value = null;
 
-    public Pattern(String ... args)
+    public PATTERN(String ... args)
     {
         this.value = this.join(args);
     }
