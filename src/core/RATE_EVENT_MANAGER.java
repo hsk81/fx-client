@@ -68,13 +68,13 @@ public final class RATE_EVENT_MANAGER extends EVENT_MANAGER {
     private Hashtable<String,PAIR> pairs = new Hashtable<String,PAIR>();
     private PAIR getPair(String q2b)
     {
-        if (pairs.containsKey(q2b))
+        if (this.pairs.containsKey(q2b))
         {
-            return pairs.get(q2b);
+            return this.pairs.get(q2b);
         }
         else
         {
-            return pairs.put(q2b, new PAIR(q2b));
+            return this.pairs.put(q2b, new PAIR(q2b));
         }
     }
 }
