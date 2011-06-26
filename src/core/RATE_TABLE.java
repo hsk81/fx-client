@@ -4,13 +4,15 @@ import java.net.*;
 import java.util.*;
 import java.util.logging.*;
 
-import core.models.utils.*;
+import core.models.util.*;
 import core.exceptions.*;
 import core.models.*;
-import core.utils.*;
+import core.util.*;
 
 public class RATE_TABLE {
 
+    protected MQ_MANAGER mqm = MQ_MANAGER.singleton;
+    
     private RATE_EVENT_MANAGER eventManager = null;
     public EVENT_MANAGER getEventManager()
     {
@@ -40,8 +42,8 @@ public class RATE_TABLE {
             get_history, pair.getQuote(), pair.getBase(), interval, numTicks
         );
 
-        MQ_MANAGER.singleton.req.send(message.getBytes(), 0);
-        byte[] bytes = MQ_MANAGER.singleton.req.recv(0);
+        this.mqm.req().send(message.getBytes(), 0);
+        byte[] bytes = this.mqm.req().recv(0);
         String reply = new String(bytes);
         
         if (reply.startsWith(message))
@@ -131,8 +133,8 @@ public class RATE_TABLE {
             get_rate, pair.getQuote(), pair.getBase()
         );
 
-        MQ_MANAGER.singleton.req.send(message.getBytes(), 0);
-        byte[] bytes = MQ_MANAGER.singleton.req.recv(0);
+        this.mqm.req().send(message.getBytes(), 0);
+        byte[] bytes = this.mqm.req().recv(0);
         String reply = new String(bytes);
 
         if (reply.startsWith(message))
@@ -181,8 +183,8 @@ public class RATE_TABLE {
 
         String message = String.format(logged_in, ip.getHostAddress());
         
-        MQ_MANAGER.singleton.req.send(message.getBytes(), 0);
-        byte[] bytes = MQ_MANAGER.singleton.req.recv(0);
+        this.mqm.req().send(message.getBytes(), 0);
+        byte[] bytes = this.mqm.req().recv(0);
         String reply = new String(bytes);
 
         if (reply.startsWith(message))
@@ -213,11 +215,11 @@ public class RATE_TABLE {
     {
         RATE_TABLE rateTable = new RATE_TABLE();
 
-        PAIR eur2usd = new PAIR("USD","EUR");
-        PAIR usd2chf = new PAIR("CHF","USD");
-        PAIR eur2chf = new PAIR("CHF","EUR");
+        PAIR eur2usd = new PAIR("EUR/USD");
+        PAIR usd2chf = new PAIR("USD/CHF");
+        PAIR eur2chf = new PAIR("EUR/CHF");
 
-        //while (rateTable.loggedIn())
+        //if (rateTable.loggedIn())
         {
             dump(rateTable, eur2usd);
             dump(rateTable, usd2chf);

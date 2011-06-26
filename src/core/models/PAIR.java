@@ -1,11 +1,12 @@
 package core.models;
 
-import java.util.logging.*;
+import core.util.*;
 import core.exceptions.*;
-import core.utils.*;
+import java.util.logging.*;
 
 public class PAIR implements Cloneable {
 
+    protected MQ_MANAGER mqm = MQ_MANAGER.singleton;
     private String base = null;
     private String quote = null;
 
@@ -63,11 +64,12 @@ public class PAIR implements Cloneable {
     {
         return this.toString();
     }
+    
     public final void setPair(String pair)
     {
         String[] splits = pair.split("/");
-        this.base = splits[0];
-        this.quote = splits[1];
+        this.quote = splits[0];
+        this.base = splits[1];
     }
 
     public PAIR getInverse()
@@ -89,8 +91,8 @@ public class PAIR implements Cloneable {
     {
         String message = String.format(get_halted, this.quote, this.base);
 
-        MQ_MANAGER.singleton.req.send(message.getBytes(), 0);
-        byte[] bytes = MQ_MANAGER.singleton.req.recv(0);
+        this.mqm.req().send(message.getBytes(), 0);
+        byte[] bytes = this.mqm.req().recv(0);
         String reply = new String(bytes);
 
         if (reply.startsWith(message))
@@ -113,11 +115,6 @@ public class PAIR implements Cloneable {
                 );
             }
 
-            /**
-             * @TODO: Appareantly all pairs are prefetched somewhere and here
-             *        only the cached pairs are returned. Implement!
-             */
-            
             return true;
         }
     }
@@ -130,9 +127,9 @@ public class PAIR implements Cloneable {
 
     public static void main(String[] args) throws Exception
     {
-        PAIR eur2usd = new PAIR("USD","EUR");
-        PAIR usd2chf = new PAIR("CHF","USD");
-        PAIR eur2chf = new PAIR("CHF","EUR");
+        PAIR eur2usd = new PAIR("EUR/USD");
+        PAIR usd2chf = new PAIR("USD/CHF");
+        PAIR eur2chf = new PAIR("EUR/CHF");
 
         System.out.println(String.format("[%s] %s: %s", System.nanoTime(),
             eur2usd.toString(), eur2usd.isHalted() ? "halted" : "active"

@@ -1,4 +1,4 @@
-package core.utils;
+package core.util;
 
 public class PATTERN {
 
