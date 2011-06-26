@@ -1,4 +1,4 @@
-package core;
+package ch.blackhan.core;
 
 public final class ACCOUNT_EVENT_INFO extends EVENT_INFO   {
 

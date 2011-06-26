@@ -1,4 +1,4 @@
-package core.models.util;
+package ch.blackhan.core.models.util;
 
 public class CANDLE_POINT implements Cloneable {
 

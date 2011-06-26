@@ -1,6 +1,6 @@
-package core;
+package ch.blackhan.core;
 
-import core.models.*;
+import ch.blackhan.core.models.*;
 
 public final class RATE_EVENT_INFO extends EVENT_INFO {
 

@@ -1,8 +1,8 @@
-package core;
+package ch.blackhan.core;
 
 import java.util.*;
-import core.util.*;
-import core.models.*;
+import ch.blackhan.core.util.*;
+import ch.blackhan.core.models.*;
 import org.zeromq.ZMQ.*;
 
 public final class RATE_EVENT_MANAGER extends EVENT_MANAGER {

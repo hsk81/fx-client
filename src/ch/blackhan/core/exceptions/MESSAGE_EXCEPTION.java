@@ -1,4 +1,4 @@
-package core.exceptions;
+package ch.blackhan.core.exceptions;
 
 public class MESSAGE_EXCEPTION extends Exception {
 

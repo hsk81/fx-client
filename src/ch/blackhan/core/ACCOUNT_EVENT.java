@@ -1,4 +1,4 @@
-package core;
+package ch.blackhan.core;
 
 public abstract class ACCOUNT_EVENT extends EVENT {
 

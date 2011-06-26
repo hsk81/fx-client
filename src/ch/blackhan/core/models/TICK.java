@@ -1,4 +1,4 @@
-package core.models;
+package ch.blackhan.core.models;
 
 public class TICK implements Cloneable {
 

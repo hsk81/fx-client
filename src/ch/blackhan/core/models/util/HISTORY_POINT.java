@@ -1,6 +1,6 @@
-package core.models.util;
+package ch.blackhan.core.models.util;
 
-import core.models.*;
+import ch.blackhan.core.models.*;
 
 public class HISTORY_POINT implements Cloneable {
 

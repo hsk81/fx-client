@@ -1,13 +1,13 @@
-package core;
+package ch.blackhan.core;
 
 import java.net.*;
 import java.util.*;
 import java.util.logging.*;
 
-import core.models.util.*;
-import core.exceptions.*;
-import core.models.*;
-import core.util.*;
+import ch.blackhan.core.models.util.*;
+import ch.blackhan.core.exceptions.*;
+import ch.blackhan.core.models.*;
+import ch.blackhan.core.util.*;
 
 public class RATE_TABLE {
 

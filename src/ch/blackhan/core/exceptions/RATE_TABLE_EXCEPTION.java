@@ -1,4 +1,4 @@
-package core.exceptions;
+package ch.blackhan.core.exceptions;
 
 public class RATE_TABLE_EXCEPTION extends FX_EXCEPTION {
 

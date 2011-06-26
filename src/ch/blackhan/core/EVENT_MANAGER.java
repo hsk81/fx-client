@@ -1,4 +1,4 @@
-package core;
+package ch.blackhan.core;
 
 import java.util.*;
 
