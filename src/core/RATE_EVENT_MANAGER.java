@@ -32,7 +32,7 @@ public final class RATE_EVENT_MANAGER extends EVENT_MANAGER {
     public void run()
     {
         /**
-         * @TODO: Implement try-catch-finally around infinite loop!
+         * @TODO: Implement try-catch-finally around "infinite" loop!
          */
         
         this.sub = this.mqm.sub();

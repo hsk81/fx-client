@@ -55,6 +55,10 @@ public final class RATE_EVENT_INFO extends EVENT_INFO {
     @Override
     public int hashCode()
     {
+        /**
+         * @TODO: Use non-string based hash!
+         */
+        
         return String.format(
             "{0} {1}", this.getPair().toString(), this.getTick().toString()
         ).hashCode();
