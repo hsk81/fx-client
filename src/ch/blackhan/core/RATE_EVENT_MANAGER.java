@@ -1,7 +1,7 @@
 package ch.blackhan.core;
 
 import java.util.*;
-import ch.blackhan.core.util.*;
+import ch.blackhan.core.mqm.*;
 import ch.blackhan.core.models.*;
 import org.zeromq.ZMQ.*;
 

@@ -21,7 +21,7 @@ public abstract class EVENT_MANAGER extends Thread {
         return this.events.add(e);
     }
 
-    boolean remove(EVENT e)
+    public boolean remove(EVENT e)
     {
         return this.events.remove(e);
     }

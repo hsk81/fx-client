@@ -1,4 +1,4 @@
-package ch.blackhan.core.util;
+package ch.blackhan.core.mqm;
 
 import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Context;

@@ -1,8 +1,9 @@
 package ch.blackhan.core.models;
 
-import ch.blackhan.core.util.*;
-import ch.blackhan.core.exceptions.*;
 import java.util.logging.*;
+
+import ch.blackhan.core.mqm.*;
+import ch.blackhan.core.exceptions.*;
 
 public class PAIR implements Cloneable {
 

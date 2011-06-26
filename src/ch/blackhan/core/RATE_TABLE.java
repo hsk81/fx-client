@@ -7,7 +7,7 @@ import java.util.logging.*;
 import ch.blackhan.core.models.util.*;
 import ch.blackhan.core.exceptions.*;
 import ch.blackhan.core.models.*;
-import ch.blackhan.core.util.*;
+import ch.blackhan.core.mqm.*;
 
 public class RATE_TABLE {
 
