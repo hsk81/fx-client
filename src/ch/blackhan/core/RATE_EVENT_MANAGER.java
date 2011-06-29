@@ -31,15 +31,14 @@ public final class RATE_EVENT_MANAGER extends EVENT_MANAGER {
     @Override
     public void run()
     {
-        /**
-         * @TODO: Implement try-catch-finally around "infinite" loop!
-         */
-        
         this.sub = this.mqm.sub();
         
         this.sub.subscribe("EUR/USD".getBytes());
         this.sub.subscribe("USD/CHF".getBytes());
         this.sub.subscribe("EUR/CHF".getBytes());
+
+        int index = 0;
+        EVENT event = null;
 
         while (true)
         {
@@ -54,12 +53,31 @@ public final class RATE_EVENT_MANAGER extends EVENT_MANAGER {
                     Double.parseDouble(st.nextToken())
                 )
             );
-            
-            for (EVENT e : this.events)
+
+            index = 0; while (true)
             {
-                if (e.match(rei))
+                event = null; synchronized (this.events)
                 {
-                    e.handle(rei, this);
+                    if (index < this.events.size())
+                    {
+                        event = this.events.get(index++);
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
+                if (event != null)
+                {
+                    if (event.match(rei)) //@TODO: Separate thread?
+                    {
+                        event.handle(rei, this);
+                    }
+                }
+                else
+                {
+                    throw new NullPointerException("event");
                 }
             }
         }
@@ -68,13 +86,11 @@ public final class RATE_EVENT_MANAGER extends EVENT_MANAGER {
     private Hashtable<String,PAIR> pairs = new Hashtable<String,PAIR>();
     private PAIR getPair(String q2b)
     {
-        if (this.pairs.containsKey(q2b))
+        if (this.pairs.containsKey(q2b) == false)
         {
-            return this.pairs.get(q2b);
+            this.pairs.put(q2b, new PAIR(q2b));
         }
-        else
-        {
-            return this.pairs.put(q2b, new PAIR(q2b));
-        }
+
+        return this.pairs.get(q2b);
     }
 }

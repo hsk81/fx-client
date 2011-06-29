@@ -96,18 +96,18 @@ public class agent implements Observer {
         return this.fxclient.isLoggedIn();
     }
 
-    private ACCOUNT getAccount(long accountID) {
+    private ACCOUNT getAccount(long accountId) {
         
-        ACCOUNT ret = null;
+        ACCOUNT result = new ACCOUNT(); //null; @TODO!
         
         try {
             
             USER me = this.fxclient.getUser();
             Vector<ACCOUNT> accounts = me.getAccounts();
 
-            for (ACCOUNT acc : accounts) {
-                if (acc.getAccountId() == accountID) {
-                    ret = acc;
+            for (ACCOUNT account : accounts) {
+                if (account.getAccountId() == accountId) {
+                    result = account;
                 }
             }
             
@@ -115,7 +115,7 @@ public class agent implements Observer {
             logger.log(Level.SEVERE, null, ex);
         }
 
-        return ret;
+        return result;
     }
 
     //////////////////////////////////////////////////////////////////////////

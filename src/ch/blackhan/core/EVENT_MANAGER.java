@@ -4,7 +4,7 @@ import java.util.*;
 
 public abstract class EVENT_MANAGER extends Thread {
 
-    protected Vector<EVENT> events = new Vector<EVENT>();
+    protected final Vector<EVENT> events = new Vector<EVENT>();
 
     protected EVENT_MANAGER()
     {
@@ -13,16 +13,46 @@ public abstract class EVENT_MANAGER extends Thread {
 
     public Vector<EVENT> getEvents()
     {
-        return (Vector<EVENT>)this.events.clone();
+        synchronized(this.events)
+        {
+            return (Vector<EVENT>)this.events.clone();
+        }
     }
 
-    public boolean add(EVENT e)
+    public boolean add(EVENT event)
     {
-        return this.events.add(e);
+        if (event != null)
+        {
+            synchronized(this.events)
+            {
+                if (!this.events.contains(event))
+                {
+                    return this.events.add(event);
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
+        else
+        {
+            return false;
+        }
     }
 
-    public boolean remove(EVENT e)
+    public boolean remove(EVENT event)
     {
-        return this.events.remove(e);
+        if (event != null)
+        {
+            synchronized(this.events)
+            {
+                return this.events.remove(event);
+            }
+        }
+        else
+        {
+            return false;
+        }
     }
 }

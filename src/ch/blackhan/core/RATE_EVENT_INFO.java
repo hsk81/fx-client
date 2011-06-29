@@ -96,4 +96,10 @@ public final class RATE_EVENT_INFO extends EVENT_INFO {
             return 0;
         }
     }
+
+    @Override
+    public String toString()
+    {
+        return String.format("%s %s", this.pair, this.tick);
+    }
 }
