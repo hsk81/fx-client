@@ -171,17 +171,17 @@ public class RATE_TABLE {
 
     public boolean loggedIn()
     {
-        InetAddress ip = null;
+        String hostAddress = "127.0.0.1";
 
         try {
-            ip = InetAddress.getLocalHost();
+            hostAddress = InetAddress.getLocalHost().getHostAddress();
         } catch (UnknownHostException ex) {
             Logger.getLogger(RATE_TABLE.class.getName()).log(
                 Level.SEVERE, null, ex
             );
         }
 
-        String message = String.format(logged_in, ip.getHostAddress());
+        String message = String.format(logged_in, hostAddress);
         
         this.mqm.req().send(message.getBytes(), 0);
         byte[] bytes = this.mqm.req().recv(0);

@@ -71,7 +71,6 @@ public class H3Event extends RATE_EVENT {
     public boolean match(EVENT_INFO ei) {
 
         RATE_EVENT_INFO rei = (RATE_EVENT_INFO)ei;
-        logger.log(Level.INFO, rei.toString()); //@TODO: INFO -> FINEST!
 
         //
         // CHECK IF TICK FROM 1 OF 3 PAIRs (and APPLY TIME FILTER)
