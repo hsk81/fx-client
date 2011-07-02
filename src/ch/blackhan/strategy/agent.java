@@ -219,10 +219,8 @@ public class agent implements Observer {
         // CREATE FXCLIENT & LOGIN INTO SYSTEM
         //
         
-        if (!self.clientLogin(new GAME())) {
-
+        if (!self.clientLogin(new GAME()) || !self.clientLogin(new GAME())) {
             System.exit(-1);
-            
         } else {            
             self.update(self.fxclient, CLIENT.CONNECTED);
         }

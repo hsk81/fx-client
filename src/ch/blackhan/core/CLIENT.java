@@ -13,7 +13,7 @@ public class CLIENT extends Observable {
     protected MQ_MANAGER mqm = MQ_MANAGER.singleton;
 
     private static final String LOGIN = "CLIENT|login|%s|%s|%s";
-    private static final String LOGOUT = "CLIENT|login|%s|%s|%s";
+    private static final String LOGOUT = "CLIENT|logout|%s|%s|%s";
     private static final String GET_SERVER_TIME = "CLIENT|get_server_time";
 
     public static final String CONNECTED = "CONNECTED";
