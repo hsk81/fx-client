@@ -11,8 +11,32 @@ import ch.blackhan.core.mqm.*;
 
 public class RATE_TABLE {
 
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
+
     protected MQ_MANAGER mqm = MQ_MANAGER.singleton;
     
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
+
+    private boolean withRateTableThread = true;
+
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
+
+    public RATE_TABLE()
+    {
+        // pass
+    }
+
+    public RATE_TABLE(boolean withRateTableThread)
+    {
+        this.withRateTableThread = withRateTableThread;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
+
     private RATE_EVENT_MANAGER eventManager = null;
     public EVENT_MANAGER getEventManager()
     {
@@ -23,15 +47,22 @@ public class RATE_TABLE {
         else
         {
             this.eventManager = new RATE_EVENT_MANAGER();
-            this.eventManager.start();
+
+            if (this.withRateTableThread)
+            {
+                this.eventManager.start();
+            }
             
             return this.eventManager;
         }
     }
 
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
+
     private static final String get_history = "RATE_TABLE|get_history|%s|%s|%s|%s";
     private static final String[] get_history_arr = get_history.split("\\|");
-    private static final int get_history_sz = get_history_arr.length;
+    private static final int get_history_sz = get_history_arr.length; //@TODO!
     
     public Vector<HISTORY_POINT> getHistory(
         PAIR pair, long interval, int numTicks
@@ -42,8 +73,8 @@ public class RATE_TABLE {
             get_history, pair.getQuote(), pair.getBase(), interval, numTicks
         );
 
-        this.mqm.req().send(message.getBytes(), 0);
-        byte[] bytes = this.mqm.req().recv(0);
+        this.mqm.send(message.getBytes());
+        byte[] bytes = this.mqm.recv();
         String reply = new String(bytes);
         
         if (reply.startsWith(message))
@@ -87,6 +118,9 @@ public class RATE_TABLE {
         }
     }
 
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
+
     public Vector<CANDLE_POINT> getCandles(
         PAIR pair, long interval, int numTicks
     )
@@ -104,6 +138,9 @@ public class RATE_TABLE {
 
         return candlePoints;
     }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
 
     public Vector<MIN_MAX_POINT> getMinMaxs(
         PAIR pair, long interval, int numTicks
@@ -123,9 +160,12 @@ public class RATE_TABLE {
         return minMaxPoints;
     }
 
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
+
     private static final String get_rate = "RATE_TABLE|get_rate|%s|%s";
     private static final String[] get_rate_arr = get_rate.split("\\|");
-    private static final int get_rate_sz = get_rate_arr.length;
+    private static final int get_rate_sz = get_rate_arr.length; //@TODO!
 
     public TICK getRate(PAIR pair) throws RATE_TABLE_EXCEPTION
     {
@@ -133,8 +173,8 @@ public class RATE_TABLE {
             get_rate, pair.getQuote(), pair.getBase()
         );
 
-        this.mqm.req().send(message.getBytes(), 0);
-        byte[] bytes = this.mqm.req().recv(0);
+        this.mqm.send(message.getBytes());
+        byte[] bytes = this.mqm.recv();
         String reply = new String(bytes);
 
         if (reply.startsWith(message))
@@ -165,9 +205,12 @@ public class RATE_TABLE {
         }
     }
     
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
+
     private static final String logged_in = "RATE_TABLE|logged_in|%s";
     private static final String[] logged_in_arr = logged_in.split("\\|");
-    private static final int logged_in_sz = logged_in_arr.length;
+    private static final int logged_in_sz = logged_in_arr.length; //@TODO!
 
     public boolean loggedIn()
     {
@@ -183,8 +226,8 @@ public class RATE_TABLE {
 
         String message = String.format(logged_in, hostAddress);
         
-        this.mqm.req().send(message.getBytes(), 0);
-        byte[] bytes = this.mqm.req().recv(0);
+        this.mqm.send(message.getBytes());
+        byte[] bytes = this.mqm.recv();
         String reply = new String(bytes);
 
         if (reply.startsWith(message))
@@ -210,6 +253,9 @@ public class RATE_TABLE {
 
         return false;
     }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
 
     public static void main(String[] args) throws Exception
     {
@@ -269,4 +315,7 @@ public class RATE_TABLE {
             ));
         }
     }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
 }

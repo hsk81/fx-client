@@ -1,42 +1,56 @@
 package ch.blackhan.core;
 
 import java.util.*;
-import org.zeromq.ZMQ.*;
+import java.util.logging.*;
 
 import ch.blackhan.core.mqm.*;
 import ch.blackhan.core.models.*;
 
+import org.zeromq.ZMQ.*;
+
 public final class RATE_EVENT_MANAGER extends EVENT_MANAGER {
 
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
+
     protected MQ_MANAGER mqm = MQ_MANAGER.singleton;
-    private Socket sub = null;
+    private Socket subSocket = null;
     
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
+
     public RATE_EVENT_MANAGER()
     {
         super();
     }
     
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
+
     @Override
     protected void finalize()
     {
-        if (this.sub != null)
+        if (this.subSocket != null)
         {
-            this.sub.unsubscribe("EUR/USD".getBytes());
-            this.sub.unsubscribe("USD/CHF".getBytes());
-            this.sub.unsubscribe("EUR/CHF".getBytes());
+            this.subSocket.unsubscribe("EUR/USD".getBytes());
+            this.subSocket.unsubscribe("USD/CHF".getBytes());
+            this.subSocket.unsubscribe("EUR/CHF".getBytes());
 
-            this.sub.close();
+            this.subSocket.close();
         }
     }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
 
     @Override
     public void run()
     {
-        this.sub = this.mqm.sub();
+        this.subSocket = this.mqm.subSocket();
         
-        this.sub.subscribe("EUR/USD".getBytes());
-        this.sub.subscribe("USD/CHF".getBytes());
-        this.sub.subscribe("EUR/CHF".getBytes());
+        this.subSocket.subscribe("EUR/USD".getBytes());
+        this.subSocket.subscribe("USD/CHF".getBytes());
+        this.subSocket.subscribe("EUR/CHF".getBytes());
 
         int index = 0;
         EVENT event = null;
@@ -44,7 +58,7 @@ public final class RATE_EVENT_MANAGER extends EVENT_MANAGER {
         while (true)
         {
             StringTokenizer st = new StringTokenizer(
-                new String(this.sub.recv(0)), "|"
+                new String(this.subSocket.recv(0)), "|"
             );
 
             RATE_EVENT_INFO rei = new RATE_EVENT_INFO(
@@ -55,6 +69,10 @@ public final class RATE_EVENT_MANAGER extends EVENT_MANAGER {
                 )
             );
 
+            Logger.getLogger(RATE_EVENT_MANAGER.class.getName()).log(
+                Level.INFO, rei.toString()
+            );
+            
             index = 0; while (true)
             {
                 event = null; synchronized (this.events)
@@ -84,6 +102,9 @@ public final class RATE_EVENT_MANAGER extends EVENT_MANAGER {
         }
     }
 
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
+
     private Hashtable<String,PAIR> pairs = new Hashtable<String,PAIR>();
     private PAIR getPair(String q2b)
     {
@@ -94,4 +115,7 @@ public final class RATE_EVENT_MANAGER extends EVENT_MANAGER {
 
         return this.pairs.get(q2b);
     }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
 }

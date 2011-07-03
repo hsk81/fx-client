@@ -10,28 +10,40 @@ import ch.blackhan.core.exceptions.*;
 
 public class CLIENT extends Observable {
 
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
+
     protected MQ_MANAGER mqm = MQ_MANAGER.singleton;
+
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
 
     private static final String LOGIN = "CLIENT|login|%s|%s|%s";
     private static final String LOGOUT = "CLIENT|logout|%s|%s|%s";
     private static final String GET_SERVER_TIME = "CLIENT|get_server_time";
 
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    
     public static final String CONNECTED = "CONNECTED";
     public static final String DISCONNECTED = "DISCONNECTED";
     public static final String FATAL_ERROR = "FATAL_ERROR";
     public static final String UPDATE = "UPDATE";
     public static final String VERSION_INFO = "1.0.0";
     
-    public static long INTERVAL_1_DAY = 1 * 24 * 3600;
-    public static long INTERVAL_1_HOUR = 1 * 3600;
-    public static long INTERVAL_1_MIN = 1 * 60;
-    public static long INTERVAL_10_SEC = 10;
-    public static long INTERVAL_15_MIN = 15 * 60;
-    public static long INTERVAL_3_HOUR = 3 * 3600;
-    public static long INTERVAL_30_MIN = 30 * 60;
-    public static long INTERVAL_30_SEC = 30;
-    public static long INTERVAL_5_MIN = 5 * 60;
-    public static long INTERVAL_5_SEC = 5;
+    public static final long INTERVAL_1_DAY = 1 * 24 * 3600;
+    public static final long INTERVAL_1_HOUR = 1 * 3600;
+    public static final long INTERVAL_1_MIN = 1 * 60;
+    public static final long INTERVAL_10_SEC = 10;
+    public static final long INTERVAL_15_MIN = 15 * 60;
+    public static final long INTERVAL_3_HOUR = 3 * 3600;
+    public static final long INTERVAL_30_MIN = 30 * 60;
+    public static final long INTERVAL_30_SEC = 30;
+    public static final long INTERVAL_5_MIN = 5 * 60;
+    public static final long INTERVAL_5_SEC = 5;
+
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
 
     public void login(String username, String password) throws
         INVALID_USER_EXCEPTION,
@@ -42,54 +54,69 @@ public class CLIENT extends Observable {
             LOGIN, username, password, getHostAddress()
         );
 
-        this.mqm.req().send(message.getBytes(), 0);
-        byte[] bytes = this.mqm.req().recv(0);
-        String reply = new String(bytes);
+        this.mqm.send(message.getBytes());
+        byte[] bytes = this.mqm.recv(CLIENT.timeout);
 
-        if (reply.startsWith(message))
+        if (bytes != null)
         {
-            StringTokenizer st = new StringTokenizer(
-                reply.substring(message.length()), "|"
-            );
+            String reply = new String(bytes);
+            if (reply.startsWith(message))
+            {
+                StringTokenizer st = new StringTokenizer(
+                    reply.substring(message.length()), "|"
+                );
 
-            String result = st.nextToken();
-            if (result.compareTo("INVALID_USER_ERROR") == 0)
-            {
-                throw new INVALID_USER_EXCEPTION(username);
-            }
-            else if (result.compareTo("INVALID_PASSWORD_ERROR") == 0)
-            {
-                throw new INVALID_PASSWORD_EXCEPTION(password);
-            }
-            else if (result.compareTo("SESSION_ERROR") == 0)
-            {
-                throw new SESSION_EXCEPTION(getHostAddress());
+                String result = st.nextToken();
+                if (result.compareTo("INVALID_USER_ERROR") == 0)
+                {
+                    throw new INVALID_USER_EXCEPTION(username);
+                }
+                else if (result.compareTo("INVALID_PASSWORD_ERROR") == 0)
+                {
+                    throw new INVALID_PASSWORD_EXCEPTION(password);
+                }
+                else if (result.compareTo("SESSION_ERROR") == 0)
+                {
+                    throw new SESSION_EXCEPTION(getHostAddress());
+                }
+                else
+                {
+                    this.user = new USER(username, password);
+                }
             }
             else
             {
-                this.user = new USER(username, password);
+                if (reply.startsWith("EXCEPTION"))
+                {
+                    throw new UnsupportedOperationException(
+                        new SERVER_EXCEPTION(reply)
+                    );
+                }
+                else
+                {
+                    throw new UnsupportedOperationException(
+                        new MESSAGE_EXCEPTION(reply)
+                    );
+                }
             }
         }
         else
         {
-            if (reply.startsWith("EXCEPTION"))
-            {
-                Logger.getLogger(CLIENT.class.getName()).log(
-                    Level.SEVERE, null, new SERVER_EXCEPTION(reply)
-                );
-            }
-            else
-            {
-                Logger.getLogger(CLIENT.class.getName()).log(
-                    Level.SEVERE, null, new MESSAGE_EXCEPTION(reply)
-                );
-            }
+            throw new UnsupportedOperationException(
+                new MESSAGE_EXCEPTION(null)
+            );
         }
     }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
 
     public boolean isLoggedIn() {
         return this.user != null;
     }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
 
     public void logout() {
 
@@ -102,80 +129,106 @@ public class CLIENT extends Observable {
             this.user.getUserName(), this.user.getPassword(), getHostAddress()
         );
 
-        this.mqm.req().send(message.getBytes(), 0);
-        byte[] bytes = this.mqm.req().recv(0);
-        String reply = new String(bytes);
+        this.mqm.send(message.getBytes());
+        byte[] bytes = this.mqm.recv(CLIENT.timeout);
 
-        if (reply.startsWith(message))
+        if (bytes != null)
         {
-            StringTokenizer st = new StringTokenizer(
-                reply.substring(message.length()), "|"
-            );
+            String reply = new String(bytes);
+            if (reply.startsWith(message))
+            {
+                StringTokenizer st = new StringTokenizer(
+                    reply.substring(message.length()), "|"
+                );
 
-            String result = st.nextToken();
-            if (result.compareTo("INVALID_USER_ERROR") == 0)
-            {
-                Logger.getLogger(CLIENT.class.getName()).log(
-                    Level.SEVERE, null, new INVALID_USER_EXCEPTION(
-                        this.user.getUserName()
-                    )
-                );
-            }
-            else if (result.compareTo("INVALID_PASSWORD_ERROR") == 0)
-            {
-                Logger.getLogger(CLIENT.class.getName()).log(
-                    Level.SEVERE, null, new INVALID_PASSWORD_EXCEPTION(
-                        this.user.getPassword()
-                    )
-                );
-            }
-            else if (result.compareTo("SESSION_ERROR") == 0)
-            {
-                Logger.getLogger(CLIENT.class.getName()).log(
-                    Level.SEVERE, null, new SESSION_EXCEPTION(
-                        getHostAddress()
-                    )
-                );
+                String result = st.nextToken();
+                if (result.compareTo("INVALID_USER_ERROR") == 0)
+                {
+                    throw new UnsupportedOperationException(
+                        new INVALID_USER_EXCEPTION(this.user.getUserName())
+                    );
+                }
+                else if (result.compareTo("INVALID_PASSWORD_ERROR") == 0)
+                {
+                    throw new UnsupportedOperationException(
+                        new INVALID_PASSWORD_EXCEPTION(this.user.getPassword())
+                    );
+                }
+                else if (result.compareTo("SESSION_ERROR") == 0)
+                {
+                    throw new UnsupportedOperationException(
+                        new SESSION_EXCEPTION(getHostAddress())
+                    );
+                }
+                else
+                {
+                    this.user = null;
+                    this.rateTable = null;
+                }
             }
             else
             {
-                this.user = null;
-                this.rateTable = null;
+                if (reply.startsWith("EXCEPTION"))
+                {
+                    throw new UnsupportedOperationException(
+                        new SERVER_EXCEPTION(reply)
+                    );
+                }
+                else
+                {
+                    throw new UnsupportedOperationException(
+                        new MESSAGE_EXCEPTION(reply)
+                    );
+                }
             }
         }
         else
         {
-            if (reply.startsWith("EXCEPTION"))
-            {
-                Logger.getLogger(CLIENT.class.getName()).log(
-                    Level.SEVERE, null, new SERVER_EXCEPTION(reply)
-                );
-            }
-            else
-            {
-                Logger.getLogger(CLIENT.class.getName()).log(
-                    Level.SEVERE, null, new MESSAGE_EXCEPTION(reply)
-                );
-            }
+            throw new UnsupportedOperationException(
+                new MESSAGE_EXCEPTION(null)
+            );
         }
     }
 
-    private int timeout = Integer.MAX_VALUE;
-    public void setTimeout(int timeout) { this.timeout = timeout; } //@TODO!?
-    public int getTimeout() { return this.timeout; }
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
 
-    private boolean withRateThread = false;
-    public void setWithRateThread(boolean flag) { this.withRateThread = flag; }
+    public static long timeout = -1L; // indefinite [microsecs]
+    public int getTimeout() { return (int)(1.0 * CLIENT.timeout / 1000.0); }
+    public void setTimeout(int timeout) { 
+        CLIENT.timeout = (timeout >= 0) ?(long)timeout * 1000L : -1L;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
+
+    private boolean withRateThread = true;
     public boolean getWithRateThread() { return this.withRateThread; }
+    public void setWithRateThread(boolean flag) { this.withRateThread = flag; }
     
-    private boolean withKeepAliveThread = false;
-    public void setWithKeepAliveThread(boolean flag) { this.withKeepAliveThread = flag; }
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * The keep alive thread seems to re-new the current session. That means the a session
+     * should expire after some time. A keep alive thread would re-new a session just before
+     * expiry.
+     */
+
+    private boolean withKeepAliveThread = true; //@TODO: Implement!
     public boolean getWithKeepAliveThread() { return this.withKeepAliveThread; }
+    public void setWithKeepAliveThread(boolean flag) { this.withKeepAliveThread = flag; }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
 
     public void setProxy(boolean state) {
 
-        this.mqm.req(state ? 80 : MQ_MANAGER.reqDefaultPort);
+        this.mqm.reqSocket(state ? 80 : MQ_MANAGER.reqSocketPortDefault);
     }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
 
     private USER user = null;
     public USER getUser() throws SESSION_EXCEPTION
@@ -190,6 +243,9 @@ public class CLIENT extends Observable {
         }
     }
 
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
+
     private RATE_TABLE rateTable = null;
     public RATE_TABLE getRateTable() throws SESSION_DISCONNECTED_EXCEPTION {
 
@@ -201,7 +257,7 @@ public class CLIENT extends Observable {
             }
             else
             {
-                return this.rateTable = new RATE_TABLE();
+                return this.rateTable = new RATE_TABLE(this.getWithRateThread());
             }
         }
         else
@@ -210,40 +266,53 @@ public class CLIENT extends Observable {
         }
     }
 
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
+
     public long getServerTime()
     {
         String message = String.format(GET_SERVER_TIME);
 
-        this.mqm.req().send(message.getBytes(), 0);
-        byte[] bytes = this.mqm.req().recv(0);
-        String reply = new String(bytes);
+        this.mqm.send(message.getBytes());
+        byte[] bytes = this.mqm.recv(CLIENT.timeout);
 
-        if (reply.startsWith(message))
+        if (bytes != null)
         {
-            StringTokenizer st = new StringTokenizer(
-                reply.substring(message.length()), "|"
-            );
-
-            return Long.parseLong(st.nextToken());
-        }
-        else
-        {
-            if (reply.startsWith("EXCEPTION"))
+            String reply = new String(bytes);
+            if (reply.startsWith(message))
             {
-                Logger.getLogger(RATE_TABLE.class.getName()).log(
-                    Level.SEVERE, null, new SERVER_EXCEPTION(reply)
+                StringTokenizer st = new StringTokenizer(
+                    reply.substring(message.length()), "|"
                 );
+
+                return Long.parseLong(st.nextToken());
             }
             else
             {
-                Logger.getLogger(RATE_TABLE.class.getName()).log(
-                    Level.SEVERE, null, new MESSAGE_EXCEPTION(reply)
-                );
+                if (reply.startsWith("EXCEPTION"))
+                {
+                    throw new UnsupportedOperationException(
+                        new SERVER_EXCEPTION(reply)
+                    );
+                }
+                else
+                {
+                    throw new UnsupportedOperationException(
+                        new MESSAGE_EXCEPTION(reply)
+                    );
+                }
             }
-
-            return Long.MIN_VALUE;
+        }
+        else
+        {
+            throw new UnsupportedOperationException(
+                new MESSAGE_EXCEPTION(null)
+            );
         }
     }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
 
     private String hostAddress = null;
     private String getHostAddress() {
@@ -261,11 +330,13 @@ public class CLIENT extends Observable {
                     Level.SEVERE, null, ex
                 );
 
-                this.hostAddress = "127.0.0.1";
+                this.hostAddress = "127.0.0.1"; //@TODO!?
             }
 
             return this.hostAddress;
         }
     }
 
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
 }
