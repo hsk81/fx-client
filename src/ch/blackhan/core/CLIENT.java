@@ -210,7 +210,7 @@ public class CLIENT extends Observable {
     ///////////////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * The keep alive thread seems to re-new the current session. That means the a session
+     * The keep alive thread seems to re-new the current session. That means that a session
      * should expire after some time. A keep alive thread would re-new a session just before
      * expiry.
      */
