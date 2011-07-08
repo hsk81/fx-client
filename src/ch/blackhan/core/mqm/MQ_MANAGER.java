@@ -44,7 +44,14 @@ public class MQ_MANAGER {
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
-    
+
+    public long timeout = -1L; // indefinite [microsecs]
+    public long getTimeout() { return this.timeout; }
+    public void setTimeout(long timeout) { this.timeout = timeout; }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
+
     public boolean send(byte[] message)
     {
         return this.reqSocket().send(message, 0);
@@ -52,10 +59,10 @@ public class MQ_MANAGER {
 
     public byte[] recv()
     {
-        return this.recv(-1);
+        return this.recv(this.timeout);
     }
-    
-    public byte[] recv(long timeout)
+
+    public byte[] recv(long timeout) // [microseconds]
     {
         long noo = this.poller.poll(timeout);
         if (noo > 0)

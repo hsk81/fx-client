@@ -55,7 +55,7 @@ public class CLIENT extends Observable {
         );
 
         this.mqm.send(message.getBytes());
-        byte[] bytes = this.mqm.recv(CLIENT.timeout);
+        byte[] bytes = this.mqm.recv();
 
         if (bytes != null)
         {
@@ -130,7 +130,7 @@ public class CLIENT extends Observable {
         );
 
         this.mqm.send(message.getBytes());
-        byte[] bytes = this.mqm.recv(CLIENT.timeout);
+        byte[] bytes = this.mqm.recv();
 
         if (bytes != null)
         {
@@ -193,10 +193,9 @@ public class CLIENT extends Observable {
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    public static long timeout = -1L; // indefinite [microsecs]
-    public int getTimeout() { return (int)(1.0 * CLIENT.timeout / 1000.0); }
+    public int getTimeout() { return (int)(1.0 * this.mqm.getTimeout() / 1000.0); }
     public void setTimeout(int timeout) { 
-        CLIENT.timeout = (timeout >= 0) ?(long)timeout * 1000L : -1L;
+        this.mqm.setTimeout((timeout >= 0) ? (long)timeout * 1000L : -1L);
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -274,7 +273,7 @@ public class CLIENT extends Observable {
         String message = String.format(GET_SERVER_TIME);
 
         this.mqm.send(message.getBytes());
-        byte[] bytes = this.mqm.recv(CLIENT.timeout);
+        byte[] bytes = this.mqm.recv();
 
         if (bytes != null)
         {
