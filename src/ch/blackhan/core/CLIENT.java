@@ -14,7 +14,7 @@ public class CLIENT extends Observable {
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    static final Logger logger = Logger.getLogger(CLIENT.class.getName());
+    protected static final Logger logger = Logger.getLogger(CLIENT.class.getName());
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -23,7 +23,12 @@ public class CLIENT extends Observable {
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
-    
+
+    private static SESSION_MANAGER session_manager = null;
+
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
+
     public static final String CONNECTED = "CONNECTED";
     public static final String DISCONNECTED = "DISCONNECTED";
     public static final String FATAL_ERROR = "FATAL_ERROR";
@@ -43,7 +48,7 @@ public class CLIENT extends Observable {
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
-
+    
     public void login(String username, String password) throws
         INVALID_USER_EXCEPTION, INVALID_PASSWORD_EXCEPTION, SESSION_EXCEPTION {
 
@@ -77,13 +82,13 @@ public class CLIENT extends Observable {
                 this.user = new USER(username, password);
             }
 
-            if (this.withKeepAliveThread)
+            if (this.withKeepAliveThread && CLIENT.session_manager == null)
             {
-                SESSION_MANAGER sm = new SESSION_MANAGER(
+                CLIENT.session_manager = new SESSION_MANAGER(
                     username, password, this.getHostAddress()
                 );
 
-                sm.start();
+                CLIENT.session_manager.start();
             }
         }
     }
@@ -136,13 +141,7 @@ public class CLIENT extends Observable {
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    /**
-     * The keep alive thread seems to re-new the current session. That means that a session
-     * should expire after some time. A keep alive thread would re-new a session just before
-     * expiry.
-     */
-
-    private boolean withKeepAliveThread = false; //@TODO: Implement!
+    private boolean withKeepAliveThread = false;
     public boolean getWithKeepAliveThread() { return this.withKeepAliveThread; }
     public void setWithKeepAliveThread(boolean flag) { this.withKeepAliveThread = flag; }
 

@@ -6,6 +6,7 @@ public class MESSAGE {
     {
         public static final String LOGIN = "CLIENT|login|%s|%s|%s";
         public static final String LOGOUT = "CLIENT|logout|%s|%s|%s";
+        public static final String REFRESH = "CLIENT|refresh|%s|%s|%s";
         public static final String GET_SERVER_TIME = "CLIENT|get_server_time";
     }
 

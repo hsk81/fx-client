@@ -35,14 +35,14 @@ public class agent implements Observer {
     // VARIUS TIMEOUTs USED IN THE SYSTEM
     //
     
-    final int DEFAULT_TIMEOUT = 1250; // [ms]
+    final int DEFAULT_TIMEOUT = -1; // [ms]
     
     //
     // USER's CONNECTION ATHENTICATION
     //
     
-    String username = "invitro81";
-    String password = "*********";
+    String username = "user";
+    String password = "****";
 
     //
     // LONG AND SHORT SUB-ACCOUNTs' IDs

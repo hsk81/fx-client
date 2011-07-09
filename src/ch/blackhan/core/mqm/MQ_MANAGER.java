@@ -139,6 +139,12 @@ public class MQ_MANAGER {
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
 
+    public ZMQ.Poller newPoller(int size) { return context.poller(size); } //@TODO!
+    public ZMQ.Socket newSocket(int type) { return context.socket(type); } //@TODO!
+
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
+
     public ZMQ.Socket reqSocket()
     {
         if (this.reqSocket == null)
@@ -216,8 +222,18 @@ public class MQ_MANAGER {
     @Override
     public void finalize() throws Throwable
     {
-        if (this.reqSocket != null) { this.reqSocket.close(); this.reqSocket = null; }
-        if (this.subSocket != null) { this.subSocket.close(); this.subSocket = null; }
+        if (this.reqSocket != null)
+        {
+            this.poller.unregister(this.reqSocket);
+            this.reqSocket.close();
+            this.reqSocket = null;
+        }
+
+        if (this.subSocket != null)
+        {
+            this.subSocket.close();
+            this.subSocket = null;
+        }
 
         this.context.term();
     }
