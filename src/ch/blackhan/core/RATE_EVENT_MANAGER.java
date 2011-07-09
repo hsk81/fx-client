@@ -6,7 +6,7 @@ import java.util.logging.*;
 import ch.blackhan.core.mqm.*;
 import ch.blackhan.core.models.*;
 
-import org.zeromq.ZMQ.*;
+import org.zeromq.ZMQ;
 
 public final class RATE_EVENT_MANAGER extends EVENT_MANAGER {
 
@@ -14,7 +14,7 @@ public final class RATE_EVENT_MANAGER extends EVENT_MANAGER {
     ///////////////////////////////////////////////////////////////////////////////////////////
 
     protected MQ_MANAGER mqm = MQ_MANAGER.singleton;
-    private Socket subSocket = null;
+    private ZMQ.Socket subSocket = null;
     
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -36,7 +36,7 @@ public final class RATE_EVENT_MANAGER extends EVENT_MANAGER {
             this.subSocket.unsubscribe("USD/CHF".getBytes());
             this.subSocket.unsubscribe("EUR/CHF".getBytes());
 
-            this.subSocket.close();
+            this.subSocket.close(); this.subSocket = null;
         }
     }
 

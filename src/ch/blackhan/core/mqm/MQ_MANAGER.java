@@ -1,21 +1,20 @@
 package ch.blackhan.core.mqm;
 
 import org.zeromq.ZMQ;
-import org.zeromq.ZMQ.Poller;
+import ch.blackhan.core.mqm.exception.*;
 
 public class MQ_MANAGER {
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    public static final String reqSocketHostDefault = "tcp://localhost";
-    public static final String subSocketHostDefault = "tcp://localhost";
+    public static final String reqSocketHost = "tcp://localhost";
+    public static final String subSocketHost = "tcp://localhost";
     public static final long reqSocketPortDefault = 6666;
     public static final long subSocketPortDefault = 6667;
 
     public static final MQ_MANAGER singleton = new MQ_MANAGER(
-        reqSocketHostDefault, reqSocketPortDefault,
-        subSocketHostDefault, subSocketPortDefault
+        reqSocketHost, reqSocketPortDefault, subSocketHost, subSocketPortDefault
     );
 
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -24,9 +23,9 @@ public class MQ_MANAGER {
     private ZMQ.Context context = null;
     private ZMQ.Poller poller = null;
     
-    private ZMQ.Socket reqSocket = null;
+    private ZMQ.Socket reqSocket = null; //TODO: Per thread!?
     private String reqSocketUri = null;
-    private ZMQ.Socket subSocket = null;
+    private ZMQ.Socket subSocket = null; //TODO: Per thread!?
     private String subSocketUri = null;
     
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -52,17 +51,72 @@ public class MQ_MANAGER {
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    public boolean send(byte[] message)
+    public String communicate(String req_message)
     {
-        return this.reqSocket().send(message, 0);
+        return this.communicate(req_message, this.timeout);
     }
 
-    public byte[] recv()
+    private String communicate(String req_message, long timeout) // [microseconds]
     {
-        return this.recv(this.timeout);
+        if (req_message != null)
+        {
+            if (this.request(req_message.getBytes()))
+            {
+                byte[] bytes = this.response(timeout);
+                if (bytes != null)
+                {
+                    String rep_message = new String(bytes);
+                    if (rep_message.startsWith(req_message))
+                    {
+                        return rep_message;
+                    }
+                    else
+                    {
+                        if (rep_message.startsWith("EXCEPTION"))
+                        {
+                            throw new UnsupportedOperationException(
+                                new SERVER_EXCEPTION(rep_message)
+                            );
+                        }
+                        else
+                        {
+                            throw new UnsupportedOperationException(
+                                new RESPONSE_EXCEPTION(rep_message)
+                            );
+                        }
+                    }
+                }
+                else
+                {
+                    throw new UnsupportedOperationException(
+                        new RESPONSE_ISNULL_EXCEPTION(req_message)
+                    );
+                }
+            }
+            else
+            {
+                throw new UnsupportedOperationException(
+                    new REQUEST_EXCEPTION(req_message)
+                );
+            }
+        }
+        else
+        {
+            throw new UnsupportedOperationException(
+                new REQUEST_ISNULL_EXCEPTION(req_message)
+            );
+        }
     }
 
-    public byte[] recv(long timeout) // [microseconds]
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
+
+    public boolean request(byte[] bytes)
+    {
+        return this.reqSocket().send(bytes, 0);
+    }
+
+    public byte[] response(long timeout) // [microseconds]
     {
         long noo = this.poller.poll(timeout);
         if (noo > 0)
@@ -85,20 +139,20 @@ public class MQ_MANAGER {
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    public ZMQ.Socket reqSocket() {
-
+    public ZMQ.Socket reqSocket()
+    {
         if (this.reqSocket == null)
         {
             this.reqSocket = context.socket(ZMQ.REQ);
             this.reqSocket.connect(reqSocketUri);
-            this.poller.register(reqSocket, Poller.POLLIN);
+            this.poller.register(reqSocket, ZMQ.Poller.POLLIN);
         }
 
         return this.reqSocket;
     }
 
-    public ZMQ.Socket reqSocket(String uri) {
-
+    private ZMQ.Socket setReqSocketUri(String uri)
+    {
         if (this.reqSocketUri.compareTo(uri) != 0)
         {
             this.poller.unregister(reqSocket);
@@ -110,21 +164,21 @@ public class MQ_MANAGER {
         return this.reqSocket();
     }
 
-    public ZMQ.Socket reqSocket(String host, long port) {
-
-        return this.reqSocket(String.format("%s:%d", host, port));
+    private ZMQ.Socket setReqSocketHostAndPort(String host, long port)
+    {
+        return this.setReqSocketUri(String.format("%s:%d", host, port));
     }
 
-    public ZMQ.Socket reqSocket(long port) {
-
-        return this.reqSocket(String.format("%s:%d", reqSocketHostDefault, port));
+    public ZMQ.Socket setReqSocketPort(long port)
+    {
+        return this.setReqSocketHostAndPort(reqSocketHost, port);
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    public ZMQ.Socket subSocket() {
-
+    public ZMQ.Socket subSocket()
+    {
         if (this.subSocket == null)
         {
             this.subSocket = context.socket(ZMQ.SUB);
@@ -134,8 +188,8 @@ public class MQ_MANAGER {
         return this.subSocket;
     }
 
-    public ZMQ.Socket subSocket(String uri) {
-
+    private ZMQ.Socket setSubSocketUri(String uri)
+    {
         if (this.subSocketUri.compareTo(uri) != 0)
         {
             this.subSocket.close();
@@ -146,24 +200,24 @@ public class MQ_MANAGER {
         return this.subSocket();
     }
 
-    public ZMQ.Socket subSocket(String host, long port) {
-
-        return this.subSocket(String.format("%s:%d", host, port));
+    private ZMQ.Socket setSubSockertHostAndPort(String host, long port)
+    {
+        return this.setSubSocketUri(String.format("%s:%d", host, port));
     }
 
-    public ZMQ.Socket subSocket(long port) {
+    public ZMQ.Socket setSubSocketPort(long port) {
 
-        return this.subSocket(String.format("%s:%d", subSocketHostDefault, port));
+        return this.setSubSockertHostAndPort(subSocketHost, port);
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
 
     @Override
-    public void finalize() throws Throwable {
-
-        if (this.reqSocket != null) { this.reqSocket.close(); }
-        if (this.subSocket != null) { this.subSocket.close(); }
+    public void finalize() throws Throwable
+    {
+        if (this.reqSocket != null) { this.reqSocket.close(); this.reqSocket = null; }
+        if (this.subSocket != null) { this.subSocket.close(); this.subSocket = null; }
 
         this.context.term();
     }

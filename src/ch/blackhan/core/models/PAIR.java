@@ -1,9 +1,8 @@
 package ch.blackhan.core.models;
 
-import java.util.logging.*;
-
+import java.util.*;
 import ch.blackhan.core.mqm.*;
-import ch.blackhan.core.exceptions.*;
+import ch.blackhan.core.mqm.util.*;
 
 public class PAIR implements Cloneable {
 
@@ -115,40 +114,16 @@ public class PAIR implements Cloneable {
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    private static final String get_halted = "PAIR|get_halted|%s|%s";
-    private static final String[] get_halted_arr = get_halted.split("\\|");
-    private static final int get_halted_sz = get_halted_arr.length;
-
     public boolean isHalted()
     {
-        String message = String.format(get_halted, this.quote, this.base);
+        String req_message = String.format(MESSAGE.PAIR.GET_HALTED, this.quote, this.base);
+        String rep_message = this.mqm.communicate(req_message);
 
-        this.mqm.send(message.getBytes());
-        byte[] bytes = this.mqm.recv();
-        String reply = new String(bytes);
+        StringTokenizer st = new StringTokenizer(
+            rep_message.substring(req_message.length()), "|"
+        );
 
-        if (reply.startsWith(message))
-        {
-            String[] array = reply.split("\\|");
-            return array[array.length - 1].compareTo("True") == 0;
-        }
-        else
-        {
-            if (reply.startsWith("EXCEPTION"))
-            {
-                Logger.getLogger(PAIR.class.getName()).log(
-                    Level.SEVERE, null, new SERVER_EXCEPTION(reply)
-                );
-            }
-            else
-            {
-                Logger.getLogger(PAIR.class.getName()).log(
-                    Level.SEVERE, null, new MESSAGE_EXCEPTION(reply)
-                );
-            }
-
-            return true;
-        }
+        return Boolean.parseBoolean(st.nextToken());
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////

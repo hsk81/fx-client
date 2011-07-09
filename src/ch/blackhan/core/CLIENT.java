@@ -6,6 +6,7 @@ import java.util.logging.*;
 
 import ch.blackhan.core.mqm.*;
 import ch.blackhan.core.models.*;
+import ch.blackhan.core.mqm.util.*;
 import ch.blackhan.core.exceptions.*;
 
 public class CLIENT extends Observable {
@@ -14,13 +15,6 @@ public class CLIENT extends Observable {
     ///////////////////////////////////////////////////////////////////////////////////////////
 
     protected MQ_MANAGER mqm = MQ_MANAGER.singleton;
-
-    ///////////////////////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////////////////////////////////////////////////////////////
-
-    private static final String LOGIN = "CLIENT|login|%s|%s|%s";
-    private static final String LOGOUT = "CLIENT|logout|%s|%s|%s";
-    private static final String GET_SERVER_TIME = "CLIENT|get_server_time";
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -46,65 +40,34 @@ public class CLIENT extends Observable {
     ///////////////////////////////////////////////////////////////////////////////////////////
 
     public void login(String username, String password) throws
-        INVALID_USER_EXCEPTION,
-        INVALID_PASSWORD_EXCEPTION,
-        SESSION_EXCEPTION {
+        INVALID_USER_EXCEPTION, INVALID_PASSWORD_EXCEPTION, SESSION_EXCEPTION {
 
-        String message = String.format(
-            LOGIN, username, password, getHostAddress()
+        String req_message = String.format(
+            MESSAGE.CLIENT.LOGIN, username, password, this.getHostAddress()
         );
 
-        this.mqm.send(message.getBytes());
-        byte[] bytes = this.mqm.recv();
+        String rep_message = this.mqm.communicate(req_message);
 
-        if (bytes != null)
+        StringTokenizer st = new StringTokenizer(
+            rep_message.substring(req_message.length()), "|"
+        );
+
+        String result = st.nextToken();
+        if (result.compareTo("INVALID_USER_ERROR") == 0)
         {
-            String reply = new String(bytes);
-            if (reply.startsWith(message))
-            {
-                StringTokenizer st = new StringTokenizer(
-                    reply.substring(message.length()), "|"
-                );
-
-                String result = st.nextToken();
-                if (result.compareTo("INVALID_USER_ERROR") == 0)
-                {
-                    throw new INVALID_USER_EXCEPTION(username);
-                }
-                else if (result.compareTo("INVALID_PASSWORD_ERROR") == 0)
-                {
-                    throw new INVALID_PASSWORD_EXCEPTION(password);
-                }
-                else if (result.compareTo("SESSION_ERROR") == 0)
-                {
-                    throw new SESSION_EXCEPTION(getHostAddress());
-                }
-                else
-                {
-                    this.user = new USER(username, password);
-                }
-            }
-            else
-            {
-                if (reply.startsWith("EXCEPTION"))
-                {
-                    throw new UnsupportedOperationException(
-                        new SERVER_EXCEPTION(reply)
-                    );
-                }
-                else
-                {
-                    throw new UnsupportedOperationException(
-                        new MESSAGE_EXCEPTION(reply)
-                    );
-                }
-            }
+            throw new INVALID_USER_EXCEPTION(username);
+        }
+        else if (result.compareTo("INVALID_PASSWORD_ERROR") == 0)
+        {
+            throw new INVALID_PASSWORD_EXCEPTION(password);
+        }
+        else if (result.compareTo("SESSION_ERROR") == 0)
+        {
+            throw new SESSION_EXCEPTION(this.getHostAddress());
         }
         else
         {
-            throw new UnsupportedOperationException(
-                new MESSAGE_EXCEPTION(null)
-            );
+            this.user = new USER(username, password);
         }
     }
 
@@ -120,73 +83,21 @@ public class CLIENT extends Observable {
 
     public void logout() {
 
-        if (this.user == null)
+        if (this.user != null)
         {
-            return;
-        }
+            String username = this.user.getUserName();
+            String password = this.user.getPassword();
 
-        String message = String.format(LOGOUT,
-            this.user.getUserName(), this.user.getPassword(), getHostAddress()
-        );
+            this.mqm.communicate(String.format(
+                MESSAGE.CLIENT.LOGOUT, username, password, this.getHostAddress()
+            ));
 
-        this.mqm.send(message.getBytes());
-        byte[] bytes = this.mqm.recv();
-
-        if (bytes != null)
-        {
-            String reply = new String(bytes);
-            if (reply.startsWith(message))
-            {
-                StringTokenizer st = new StringTokenizer(
-                    reply.substring(message.length()), "|"
-                );
-
-                String result = st.nextToken();
-                if (result.compareTo("INVALID_USER_ERROR") == 0)
-                {
-                    throw new UnsupportedOperationException(
-                        new INVALID_USER_EXCEPTION(this.user.getUserName())
-                    );
-                }
-                else if (result.compareTo("INVALID_PASSWORD_ERROR") == 0)
-                {
-                    throw new UnsupportedOperationException(
-                        new INVALID_PASSWORD_EXCEPTION(this.user.getPassword())
-                    );
-                }
-                else if (result.compareTo("SESSION_ERROR") == 0)
-                {
-                    throw new UnsupportedOperationException(
-                        new SESSION_EXCEPTION(getHostAddress())
-                    );
-                }
-                else
-                {
-                    this.user = null;
-                    this.rateTable = null;
-                }
-            }
-            else
-            {
-                if (reply.startsWith("EXCEPTION"))
-                {
-                    throw new UnsupportedOperationException(
-                        new SERVER_EXCEPTION(reply)
-                    );
-                }
-                else
-                {
-                    throw new UnsupportedOperationException(
-                        new MESSAGE_EXCEPTION(reply)
-                    );
-                }
-            }
+            this.user = null;
+            this.rateTable = null;
         }
         else
         {
-            throw new UnsupportedOperationException(
-                new MESSAGE_EXCEPTION(null)
-            );
+            this.rateTable = null;
         }
     }
 
@@ -223,7 +134,7 @@ public class CLIENT extends Observable {
 
     public void setProxy(boolean state) {
 
-        this.mqm.reqSocket(state ? 80 : MQ_MANAGER.reqSocketPortDefault);
+        this.mqm.setReqSocketPort(state ? 80 : MQ_MANAGER.reqSocketPortDefault);
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -238,7 +149,7 @@ public class CLIENT extends Observable {
         }
         else
         {
-            throw new SESSION_EXCEPTION(getHostAddress());
+            throw new SESSION_EXCEPTION(this.getHostAddress());
         }
     }
 
@@ -261,7 +172,7 @@ public class CLIENT extends Observable {
         }
         else
         {
-            throw new SESSION_DISCONNECTED_EXCEPTION(getHostAddress());
+            throw new SESSION_DISCONNECTED_EXCEPTION(this.getHostAddress());
         }
     }
 
@@ -270,44 +181,14 @@ public class CLIENT extends Observable {
 
     public long getServerTime()
     {
-        String message = String.format(GET_SERVER_TIME);
+        String req_message = String.format(MESSAGE.CLIENT.GET_SERVER_TIME);
+        String rep_message = this.mqm.communicate(req_message);
+ 
+        StringTokenizer st = new StringTokenizer(
+            rep_message.substring(req_message.length()), "|"
+        );
 
-        this.mqm.send(message.getBytes());
-        byte[] bytes = this.mqm.recv();
-
-        if (bytes != null)
-        {
-            String reply = new String(bytes);
-            if (reply.startsWith(message))
-            {
-                StringTokenizer st = new StringTokenizer(
-                    reply.substring(message.length()), "|"
-                );
-
-                return Long.parseLong(st.nextToken());
-            }
-            else
-            {
-                if (reply.startsWith("EXCEPTION"))
-                {
-                    throw new UnsupportedOperationException(
-                        new SERVER_EXCEPTION(reply)
-                    );
-                }
-                else
-                {
-                    throw new UnsupportedOperationException(
-                        new MESSAGE_EXCEPTION(reply)
-                    );
-                }
-            }
-        }
-        else
-        {
-            throw new UnsupportedOperationException(
-                new MESSAGE_EXCEPTION(null)
-            );
-        }
+        return Long.parseLong(st.nextToken());
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -322,9 +203,12 @@ public class CLIENT extends Observable {
         }
         else
         {
-            try {
+            try
+            {
                 this.hostAddress = InetAddress.getLocalHost().getHostAddress();
-            } catch (UnknownHostException ex) {
+            }
+            catch (UnknownHostException ex)
+            {
                 Logger.getLogger(CLIENT.class.getName()).log(
                     Level.SEVERE, null, ex
                 );
