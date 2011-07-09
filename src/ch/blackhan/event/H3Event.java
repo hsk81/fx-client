@@ -202,7 +202,7 @@ public class H3Event extends RATE_EVENT {
 
     private void reduce(ACCOUNT account, MARKET_ORDER mo, double pnl) {
 
-        assert (account != null); //@TODO!?
+        assert (account != null); //@TODO!
         
     }
 
