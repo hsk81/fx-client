@@ -84,6 +84,7 @@ public class agent implements Observer {
             this.fxclient = fxclient;
             this.fxclient.setTimeout(this.DEFAULT_TIMEOUT);
             this.fxclient.setWithRateThread(true);
+            this.fxclient.setWithKeepAliveThread(true);
             this.fxclient.login(username, password);
 
         } catch (INVALID_USER_EXCEPTION ex) {

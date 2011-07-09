@@ -14,7 +14,12 @@ public class CLIENT extends Observable {
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    protected MQ_MANAGER mqm = MQ_MANAGER.singleton;
+    static final Logger logger = Logger.getLogger(CLIENT.class.getName());
+
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
+
+    protected final MQ_MANAGER mqm = MQ_MANAGER.singleton;
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -67,7 +72,19 @@ public class CLIENT extends Observable {
         }
         else
         {
-            this.user = new USER(username, password);
+            if (this.user == null)
+            {
+                this.user = new USER(username, password);
+            }
+
+            if (this.withKeepAliveThread)
+            {
+                SESSION_MANAGER sm = new SESSION_MANAGER(
+                    username, password, this.getHostAddress()
+                );
+
+                sm.start();
+            }
         }
     }
 
@@ -112,7 +129,7 @@ public class CLIENT extends Observable {
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    private boolean withRateThread = true;
+    private boolean withRateThread = false;
     public boolean getWithRateThread() { return this.withRateThread; }
     public void setWithRateThread(boolean flag) { this.withRateThread = flag; }
     
@@ -125,7 +142,7 @@ public class CLIENT extends Observable {
      * expiry.
      */
 
-    private boolean withKeepAliveThread = true; //@TODO: Implement!
+    private boolean withKeepAliveThread = false; //@TODO: Implement!
     public boolean getWithKeepAliveThread() { return this.withKeepAliveThread; }
     public void setWithKeepAliveThread(boolean flag) { this.withKeepAliveThread = flag; }
 
@@ -209,10 +226,7 @@ public class CLIENT extends Observable {
             }
             catch (UnknownHostException ex)
             {
-                Logger.getLogger(CLIENT.class.getName()).log(
-                    Level.SEVERE, null, ex
-                );
-
+                logger.log(Level.SEVERE, null, ex);
                 this.hostAddress = "127.0.0.1"; //@TODO!?
             }
 

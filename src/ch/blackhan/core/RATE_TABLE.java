@@ -15,7 +15,12 @@ public class RATE_TABLE {
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    protected MQ_MANAGER mqm = MQ_MANAGER.singleton;
+    static final Logger logger = Logger.getLogger(RATE_TABLE.class.getName());
+
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
+
+    protected final MQ_MANAGER mqm = MQ_MANAGER.singleton;
     
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -166,12 +171,13 @@ public class RATE_TABLE {
     {
         String hostAddress = "127.0.0.1";
 
-        try {
+        try
+        {
             hostAddress = InetAddress.getLocalHost().getHostAddress();
-        } catch (UnknownHostException ex) {
-            Logger.getLogger(RATE_TABLE.class.getName()).log(
-                Level.SEVERE, null, ex
-            );
+        } 
+        catch (UnknownHostException ex)
+        {
+            logger.log(Level.SEVERE, null, ex);
         }
 
         String req_message = String.format(MESSAGE.RATE_TABLE.LOGGED_IN, hostAddress);
