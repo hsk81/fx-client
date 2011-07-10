@@ -24,7 +24,7 @@ public class CLIENT extends Observable {
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    private static SESSION_MANAGER session_manager = null;
+    private static KEEP_ALIVE_THREAD keep_alive_thread = null;
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -50,45 +50,48 @@ public class CLIENT extends Observable {
     ///////////////////////////////////////////////////////////////////////////////////////////
     
     public void login(String username, String password) throws
-        INVALID_USER_EXCEPTION, INVALID_PASSWORD_EXCEPTION, SESSION_EXCEPTION {
-
-        String req_message = String.format(
-            MESSAGE.CLIENT.LOGIN, username, password, this.getHostAddress()
-        );
-
-        String rep_message = this.mqm.communicate(req_message);
-
-        StringTokenizer st = new StringTokenizer(
-            rep_message.substring(req_message.length()), "|"
-        );
-
-        String result = st.nextToken();
-        if (result.compareTo("INVALID_USER_ERROR") == 0)
+        INVALID_USER_EXCEPTION, INVALID_PASSWORD_EXCEPTION, SESSION_EXCEPTION
+    {
+        synchronized (this)
         {
-            throw new INVALID_USER_EXCEPTION(username);
-        }
-        else if (result.compareTo("INVALID_PASSWORD_ERROR") == 0)
-        {
-            throw new INVALID_PASSWORD_EXCEPTION(password);
-        }
-        else if (result.compareTo("SESSION_ERROR") == 0)
-        {
-            throw new SESSION_EXCEPTION(this.getHostAddress());
-        }
-        else
-        {
-            if (this.user == null)
+            String req_message = String.format(
+                MESSAGE.CLIENT.LOGIN, username, password, this.getHostAddress()
+            );
+
+            String rep_message = this.mqm.communicate(req_message);
+
+            StringTokenizer st = new StringTokenizer(
+                rep_message.substring(req_message.length()), "|"
+            );
+
+            String result = st.nextToken();
+            if (result.compareTo("INVALID_USER_ERROR") == 0)
             {
-                this.user = new USER(username, password);
+                throw new INVALID_USER_EXCEPTION(username);
             }
-
-            if (this.withKeepAliveThread && CLIENT.session_manager == null)
+            else if (result.compareTo("INVALID_PASSWORD_ERROR") == 0)
             {
-                CLIENT.session_manager = new SESSION_MANAGER(
-                    username, password, this.getHostAddress()
-                );
+                throw new INVALID_PASSWORD_EXCEPTION(password);
+            }
+            else if (result.compareTo("SESSION_ERROR") == 0)
+            {
+                throw new SESSION_EXCEPTION(this.getHostAddress());
+            }
+            else
+            {
+                if (this.user == null)
+                {
+                    this.user = new USER(username, password);
+                }
 
-                CLIENT.session_manager.start();
+                if (this.withKeepAliveThread && CLIENT.keep_alive_thread == null)
+                {
+                    CLIENT.keep_alive_thread = new KEEP_ALIVE_THREAD(
+                        username, password, this.getHostAddress()
+                    );
+
+                    CLIENT.keep_alive_thread.start();
+                }
             }
         }
     }
@@ -96,30 +99,50 @@ public class CLIENT extends Observable {
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    public boolean isLoggedIn() {
+    public boolean isLoggedIn()
+    {
         return this.user != null;
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    public void logout() {
-
-        if (this.user != null)
+    public void logout()
+    {
+        synchronized (this)
         {
-            String username = this.user.getUserName();
-            String password = this.user.getPassword();
+            if (this.user != null)
+            {
+                while (CLIENT.keep_alive_thread.isAlive())
+                {
+                    CLIENT.keep_alive_thread.interrupt();
 
-            this.mqm.communicate(String.format(
-                MESSAGE.CLIENT.LOGOUT, username, password, this.getHostAddress()
-            ));
+                    try
+                    {
+                        this.wait(KEEP_ALIVE_THREAD.refresh_rate);
+                    } 
+                    catch (InterruptedException ex)
+                    {
+                        logger.log(Level.SEVERE, null, ex);
+                    }
+                }
 
-            this.user = null;
-            this.rateTable = null;
-        }
-        else
-        {
-            this.rateTable = null;
+                CLIENT.keep_alive_thread = null;
+
+                String username = this.user.getUserName();
+                String password = this.user.getPassword();
+
+                this.mqm.communicate(String.format(
+                    MESSAGE.CLIENT.LOGOUT, username, password, this.getHostAddress()
+                ));
+
+                this.user = null;
+                this.rateTable = null;
+            }
+            else
+            {
+                this.rateTable = null;
+            }
         }
     }
 
@@ -127,7 +150,8 @@ public class CLIENT extends Observable {
     ///////////////////////////////////////////////////////////////////////////////////////////
 
     public int getTimeout() { return (int)(1.0 * this.mqm.getTimeout() / 1000.0); }
-    public void setTimeout(int timeout) { 
+    public void setTimeout(int timeout)
+    {
         this.mqm.setTimeout((timeout >= 0) ? (long)timeout * 1000L : -1L);
     }
 
@@ -148,9 +172,10 @@ public class CLIENT extends Observable {
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    public void setProxy(boolean state) {
-
-        this.mqm.setReqSocketPort(state ? 80 : MQ_MANAGER.reqSocketPortDefault);
+    public void setProxy(boolean state)
+    {
+        this.mqm.setReqSocketPort(state ? 80 : MQ_MANAGER.reqSocketPort);
+        this.mqm.setSubSocketPort(state ? 81 : MQ_MANAGER.subSocketPort);
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -173,8 +198,8 @@ public class CLIENT extends Observable {
     ///////////////////////////////////////////////////////////////////////////////////////////
 
     private RATE_TABLE rateTable = null;
-    public RATE_TABLE getRateTable() throws SESSION_DISCONNECTED_EXCEPTION {
-
+    public RATE_TABLE getRateTable() throws SESSION_DISCONNECTED_EXCEPTION
+    {
         if (this.user != null)
         {
             if (this.rateTable != null)
@@ -211,8 +236,8 @@ public class CLIENT extends Observable {
     ///////////////////////////////////////////////////////////////////////////////////////////
 
     private String hostAddress = null;
-    private String getHostAddress() {
-
+    private String getHostAddress()
+    {
         if (this.hostAddress != null)
         {
             return this.hostAddress;
@@ -225,8 +250,7 @@ public class CLIENT extends Observable {
             }
             catch (UnknownHostException ex)
             {
-                logger.log(Level.SEVERE, null, ex);
-                this.hostAddress = "127.0.0.1"; //@TODO!?
+                logger.log(Level.SEVERE, null, ex); this.hostAddress = "127.0.0.1";
             }
 
             return this.hostAddress;

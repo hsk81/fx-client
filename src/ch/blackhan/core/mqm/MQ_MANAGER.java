@@ -10,11 +10,11 @@ public class MQ_MANAGER {
 
     public static final String reqSocketHost = "tcp://localhost";
     public static final String subSocketHost = "tcp://localhost";
-    public static final long reqSocketPortDefault = 6666;
-    public static final long subSocketPortDefault = 6667;
+    public static final long reqSocketPort = 6666;
+    public static final long subSocketPort = 6667;
 
     public static final MQ_MANAGER singleton = new MQ_MANAGER(
-        reqSocketHost, reqSocketPortDefault, subSocketHost, subSocketPortDefault
+        reqSocketHost, reqSocketPort, subSocketHost, subSocketPort
     );
 
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -135,12 +135,6 @@ public class MQ_MANAGER {
             return null;
         }
     }
-
-    ///////////////////////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////////////////////////////////////////////////////////////
-
-    public ZMQ.Poller newPoller(int size) { return context.poller(size); } //@TODO!
-    public ZMQ.Socket newSocket(int type) { return context.socket(type); } //@TODO!
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
