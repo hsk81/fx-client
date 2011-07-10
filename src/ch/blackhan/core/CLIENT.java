@@ -8,6 +8,7 @@ import ch.blackhan.core.mqm.*;
 import ch.blackhan.core.models.*;
 import ch.blackhan.core.mqm.util.*;
 import ch.blackhan.core.exceptions.*;
+import ch.blackhan.core.models.util.*;
 
 public class CLIENT extends Observable {
 

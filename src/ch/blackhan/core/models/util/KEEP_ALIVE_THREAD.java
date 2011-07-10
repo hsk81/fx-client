@@ -1,4 +1,4 @@
-package ch.blackhan.core;
+package ch.blackhan.core.models.util;
 
 import java.util.*;
 import java.util.logging.*;
