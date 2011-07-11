@@ -7,8 +7,6 @@ import ch.blackhan.core.mqm.*;
 import ch.blackhan.core.mqm.util.*;
 import ch.blackhan.core.mqm.exception.*;
 
-import org.zeromq.*;
-
 public final class KEEP_ALIVE_THREAD extends Thread {
 
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -19,8 +17,13 @@ public final class KEEP_ALIVE_THREAD extends Thread {
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    public static final long timeout = -1L; //[microsecs]
-    public static final long refresh_rate = 4096; //[ms]
+    protected final MQ_MANAGER mqm = MQ_MANAGER.unique;
+
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
+
+    public static final long timeout = -1L; // indefinite [microsecs]
+    public static final long refresh_rate = 1 << 16; //[ms]
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -42,16 +45,6 @@ public final class KEEP_ALIVE_THREAD extends Thread {
     @Override
     public void run()
     {
-        ZMQ.Context context = ZMQ.context(1);
-        ZMQ.Poller poller = context.poller(1);
-        ZMQ.Socket socket = context.socket(ZMQ.REQ);
-
-        socket.connect(String.format("%s:%d",
-            MQ_MANAGER.reqSocketHost, MQ_MANAGER.reqSocketPort
-        ));
-        
-        poller.register(socket, ZMQ.Poller.POLLIN);
-        
         String req_message = String.format(
             MESSAGE.CLIENT.REFRESH, this.username, this.password, this.hostaddr
         );
@@ -60,66 +53,38 @@ public final class KEEP_ALIVE_THREAD extends Thread {
         {
             while (true)
             {
-                if (socket.send(req_message.getBytes(), 0))
+                String rep_message = this.mqm.communicate(req_message, timeout);
+                if (rep_message != null)
                 {
-                    long noo = poller.poll(KEEP_ALIVE_THREAD.timeout);
-                    if (noo > 0)
+                    String result = new StringTokenizer(
+                        rep_message.substring(req_message.length()), "|"
+                    ).nextToken();
+
+                    if (result.compareTo("INVALID_USER_ERROR") == 0 ||
+                        result.compareTo("INVALID_PASSWORD_ERROR") == 0 ||
+                        result.compareTo("SESSION_ERROR") == 0)
                     {
-                        if (poller.pollin(0))
-                        {
-                            String rep_message = new String(socket.recv(0));
-                            if (rep_message != null)
-                            {
-                                String result = new StringTokenizer(
-                                    rep_message.substring(req_message.length()), "|"
-                                ).nextToken();
-                                
-                                if (result.compareTo("INVALID_USER_ERROR") == 0 ||
-                                    result.compareTo("INVALID_PASSWORD_ERROR") == 0 ||
-                                    result.compareTo("SESSION_ERROR") == 0)
-                                {
-                                    logger.log(Level.SEVERE, result); break;
-                                }
-                                else
-                                {
-                                    try
-                                    {
-                                        synchronized (this)
-                                        {
-                                            this.wait(KEEP_ALIVE_THREAD.refresh_rate);
-                                        }
-                                    }
-                                    catch (InterruptedException ex)
-                                    {
-                                        break;
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                logger.log(Level.SEVERE, null,
-                                    new RESPONSE_ISNULL_EXCEPTION(req_message)
-                                ); break;
-                            }
-                        }
-                        else
-                        {
-                            logger.log(Level.SEVERE, null,
-                                new RESPONSE_ISNULL_EXCEPTION(req_message)
-                            ); break;
-                        }
+                        logger.log(Level.SEVERE, result); break;
                     }
                     else
                     {
-                        logger.log(Level.SEVERE, null,
-                            new RESPONSE_ISNULL_EXCEPTION(req_message)
-                        ); break;
+                        try
+                        {
+                            synchronized (this)
+                            {
+                                this.wait(KEEP_ALIVE_THREAD.refresh_rate);
+                            }
+                        }
+                        catch (InterruptedException ex)
+                        {
+                            break;
+                        }
                     }
                 }
                 else
                 {
                     logger.log(Level.SEVERE, null,
-                        new REQUEST_EXCEPTION(req_message)
+                        new RESPONSE_ISNULL_EXCEPTION(req_message)
                     ); break;
                 }
             }
@@ -127,12 +92,6 @@ public final class KEEP_ALIVE_THREAD extends Thread {
         catch (Exception ex)
         {
             logger.log(Level.SEVERE, null, ex);
-        }
-        finally
-        {
-            poller.unregister(socket);
-            socket.close();
-            context.term();
         }
     }
 

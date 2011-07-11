@@ -16,8 +16,13 @@ public class MQ_MANAGER {
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    private ZMQ.Context context = null;
-    private ZMQ.Poller poller = null;
+    private static final ZMQ.Context context = ZMQ.context(1);
+    
+    private static final ThreadLocal<ZMQ.Poller> poller = new ThreadLocal<ZMQ.Poller>() {
+        @Override protected ZMQ.Poller initialValue() {
+            return MQ_MANAGER.context.poller(1);
+        }
+    };
 
     private static final ThreadLocal<ZMQ.Socket> reqSocket = new ThreadLocal<ZMQ.Socket>();
     private String reqSocketUri = null;
@@ -34,9 +39,6 @@ public class MQ_MANAGER {
     private MQ_MANAGER(
         String reqHost, long reqPort, String subHost, long subPort)
     {
-        this.context = ZMQ.context(1);
-        this.poller = this.context.poller(1);
-        
         this.reqSocketUri = String.format("%s:%d", reqHost, reqPort);
         this.subSocketUri = String.format("%s:%d", subHost, subPort);
     }
@@ -56,7 +58,7 @@ public class MQ_MANAGER {
         return this.communicate(req_message, this.timeout);
     }
 
-    private String communicate(String req_message, long timeout) // [microsecs]
+    public String communicate(String req_message, long timeout) //[microsecs]
     {
         if (req_message != null)
         {
@@ -116,12 +118,12 @@ public class MQ_MANAGER {
         return this.reqSocket().send(bytes, 0);
     }
 
-    public byte[] response(long timeout) // [microsecs]
+    public byte[] response(long timeout) //[microsecs]
     {
-        long noo = this.poller.poll(timeout);
+        long noo = MQ_MANAGER.poller.get().poll(timeout);
         if (noo > 0)
         {
-            if (this.poller.pollin(0))
+            if (MQ_MANAGER.poller.get().pollin(0))
             {
                 return this.reqSocket().recv(0);
             }
@@ -145,7 +147,7 @@ public class MQ_MANAGER {
         {
             MQ_MANAGER.reqSocket.set(context.socket(ZMQ.REQ));
             MQ_MANAGER.reqSocket.get().connect(this.reqSocketUri);
-            this.poller.register(MQ_MANAGER.reqSocket.get(), ZMQ.Poller.POLLIN);
+            MQ_MANAGER.poller.get().register(MQ_MANAGER.reqSocket.get(), ZMQ.Poller.POLLIN);
         }
 
         return MQ_MANAGER.reqSocket.get();
@@ -155,7 +157,7 @@ public class MQ_MANAGER {
     {
         if (this.reqSocketUri.compareTo(uri) != 0)
         {
-            this.poller.unregister(MQ_MANAGER.reqSocket.get());
+            MQ_MANAGER.poller.get().unregister(MQ_MANAGER.reqSocket.get());
             MQ_MANAGER.reqSocket.get().close();
             MQ_MANAGER.reqSocket.set(null);
             this.reqSocketUri = uri;
@@ -213,12 +215,11 @@ public class MQ_MANAGER {
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    @Override
-    public void finalize() throws Throwable
+    @Override public void finalize() throws Throwable
     {
         if (MQ_MANAGER.reqSocket.get() != null)
         {
-            this.poller.unregister(MQ_MANAGER.reqSocket.get());
+            MQ_MANAGER.poller.get().unregister(MQ_MANAGER.reqSocket.get());
             MQ_MANAGER.reqSocket.get().close();
             MQ_MANAGER.reqSocket.set(null);
         }
@@ -229,7 +230,7 @@ public class MQ_MANAGER {
             MQ_MANAGER.subSocket.set(null);
         }
 
-        this.context.term();
+        MQ_MANAGER.context.term();
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////
