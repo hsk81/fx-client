@@ -1,7 +1,7 @@
 package ch.blackhan.core.mqm;
 
-import org.zeromq.ZMQ;
 import ch.blackhan.core.mqm.exception.*;
+import org.zeromq.ZMQ;
 
 public class MQ_MANAGER {
 
@@ -9,36 +9,36 @@ public class MQ_MANAGER {
     ///////////////////////////////////////////////////////////////////////////////////////////
 
     public static final String reqSocketHost = "tcp://localhost";
-    public static final String subSocketHost = "tcp://localhost";
     public static final long reqSocketPort = 6666;
+    public static final String subSocketHost = "tcp://localhost";
     public static final long subSocketPort = 6667;
-
-    public static final MQ_MANAGER singleton = new MQ_MANAGER(
-        reqSocketHost, reqSocketPort, subSocketHost, subSocketPort
-    );
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
 
     private ZMQ.Context context = null;
     private ZMQ.Poller poller = null;
-    
-    private ZMQ.Socket reqSocket = null; //TODO: Per thread!?
+
+    private static final ThreadLocal<ZMQ.Socket> reqSocket = new ThreadLocal<ZMQ.Socket>();
     private String reqSocketUri = null;
-    private ZMQ.Socket subSocket = null; //TODO: Per thread!?
+    private static final ThreadLocal<ZMQ.Socket> subSocket = new ThreadLocal<ZMQ.Socket>();
     private String subSocketUri = null;
     
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
     
+    public static final MQ_MANAGER unique = new MQ_MANAGER(
+        reqSocketHost, reqSocketPort, subSocketHost, subSocketPort
+    );
+
     private MQ_MANAGER(
         String reqHost, long reqPort, String subHost, long subPort)
     {
-        this.reqSocketUri = String.format("%s:%d", reqHost, reqPort);
-        this.subSocketUri = String.format("%s:%d", subHost, subPort);
-
         this.context = ZMQ.context(1);
         this.poller = this.context.poller(1);
+        
+        this.reqSocketUri = String.format("%s:%d", reqHost, reqPort);
+        this.subSocketUri = String.format("%s:%d", subHost, subPort);
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -56,7 +56,7 @@ public class MQ_MANAGER {
         return this.communicate(req_message, this.timeout);
     }
 
-    private String communicate(String req_message, long timeout) // [microseconds]
+    private String communicate(String req_message, long timeout) // [microsecs]
     {
         if (req_message != null)
         {
@@ -141,23 +141,23 @@ public class MQ_MANAGER {
 
     public ZMQ.Socket reqSocket()
     {
-        if (this.reqSocket == null)
+        if (MQ_MANAGER.reqSocket.get() == null)
         {
-            this.reqSocket = context.socket(ZMQ.REQ);
-            this.reqSocket.connect(reqSocketUri);
-            this.poller.register(reqSocket, ZMQ.Poller.POLLIN);
+            MQ_MANAGER.reqSocket.set(context.socket(ZMQ.REQ));
+            MQ_MANAGER.reqSocket.get().connect(this.reqSocketUri);
+            this.poller.register(MQ_MANAGER.reqSocket.get(), ZMQ.Poller.POLLIN);
         }
 
-        return this.reqSocket;
+        return MQ_MANAGER.reqSocket.get();
     }
 
     private ZMQ.Socket setReqSocketUri(String uri)
     {
         if (this.reqSocketUri.compareTo(uri) != 0)
         {
-            this.poller.unregister(reqSocket);
-            this.reqSocket.close();
-            this.reqSocket = null;
+            this.poller.unregister(MQ_MANAGER.reqSocket.get());
+            MQ_MANAGER.reqSocket.get().close();
+            MQ_MANAGER.reqSocket.set(null);
             this.reqSocketUri = uri;
         }
 
@@ -179,21 +179,21 @@ public class MQ_MANAGER {
 
     public ZMQ.Socket subSocket()
     {
-        if (this.subSocket == null)
+        if (MQ_MANAGER.subSocket.get() == null)
         {
-            this.subSocket = context.socket(ZMQ.SUB);
-            this.subSocket.connect(subSocketUri);
+            MQ_MANAGER.subSocket.set(context.socket(ZMQ.SUB));
+            MQ_MANAGER.subSocket.get().connect(this.subSocketUri);
         }
         
-        return this.subSocket;
+        return MQ_MANAGER.subSocket.get();
     }
 
     private ZMQ.Socket setSubSocketUri(String uri)
     {
         if (this.subSocketUri.compareTo(uri) != 0)
         {
-            this.subSocket.close();
-            this.subSocket = null;
+            MQ_MANAGER.subSocket.get().close();
+            MQ_MANAGER.subSocket.set(null);
             this.subSocketUri = uri;
         }
 
@@ -216,17 +216,17 @@ public class MQ_MANAGER {
     @Override
     public void finalize() throws Throwable
     {
-        if (this.reqSocket != null)
+        if (MQ_MANAGER.reqSocket.get() != null)
         {
-            this.poller.unregister(this.reqSocket);
-            this.reqSocket.close();
-            this.reqSocket = null;
+            this.poller.unregister(MQ_MANAGER.reqSocket.get());
+            MQ_MANAGER.reqSocket.get().close();
+            MQ_MANAGER.reqSocket.set(null);
         }
 
-        if (this.subSocket != null)
+        if (MQ_MANAGER.subSocket.get() != null)
         {
-            this.subSocket.close();
-            this.subSocket = null;
+            MQ_MANAGER.subSocket.get().close();
+            MQ_MANAGER.subSocket.set(null);
         }
 
         this.context.term();
