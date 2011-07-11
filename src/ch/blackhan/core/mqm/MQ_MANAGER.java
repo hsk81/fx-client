@@ -116,7 +116,7 @@ public class MQ_MANAGER {
         return this.reqSocket().send(bytes, 0);
     }
 
-    public byte[] response(long timeout) // [microseconds]
+    public byte[] response(long timeout) // [microsecs]
     {
         long noo = this.poller.poll(timeout);
         if (noo > 0)
