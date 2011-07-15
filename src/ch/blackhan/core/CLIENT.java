@@ -117,15 +117,6 @@ public class CLIENT extends Observable {
                 while (CLIENT.keep_alive_thread.isAlive())
                 {
                     CLIENT.keep_alive_thread.interrupt();
-
-                    try
-                    {
-                        this.wait(KEEP_ALIVE_THREAD.refresh_rate);
-                    } 
-                    catch (InterruptedException ex)
-                    {
-                        logger.log(Level.SEVERE, null, ex);
-                    }
                 }
 
                 CLIENT.keep_alive_thread = null;

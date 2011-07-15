@@ -242,7 +242,7 @@ public class agent implements Observer {
                 //
                 
                 synchronized (notifyer) {
-                    notifyer.wait(); // milli secs
+                    notifyer.wait(); //[ms]
                 }
                 
             } catch (InterruptedException ie) {
