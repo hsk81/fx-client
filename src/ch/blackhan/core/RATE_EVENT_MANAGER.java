@@ -55,7 +55,7 @@ public final class RATE_EVENT_MANAGER extends EVENT_MANAGER {
     @Override
     public void run()
     {
-        this.subSocket = this.mqm.subSocket();
+        this.subSocket = this.mqm.getSubscriber();
         
         this.subSocket.subscribe("EUR/USD".getBytes());
         this.subSocket.subscribe("USD/CHF".getBytes());

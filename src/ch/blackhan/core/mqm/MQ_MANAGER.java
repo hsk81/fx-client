@@ -8,10 +8,10 @@ public class MQ_MANAGER {
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    public static final String reqSocketHost = "tcp://localhost";
-    public static final long reqSocketPort = 6666;
-    public static final String subSocketHost = "tcp://localhost";
-    public static final long subSocketPort = 6667;
+    public static final String requestorHost = "tcp://localhost";
+    public static final long requestorPort = 6666;
+    public static final String subscriberHost = "tcp://localhost";
+    public static final long subscriberPort = 6667;
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -33,7 +33,7 @@ public class MQ_MANAGER {
     ///////////////////////////////////////////////////////////////////////////////////////////
     
     public static final MQ_MANAGER unique = new MQ_MANAGER(
-        reqSocketHost, reqSocketPort, subSocketHost, subSocketPort
+        requestorHost, requestorPort, subscriberHost, subscriberPort
     );
 
     private MQ_MANAGER(
@@ -115,7 +115,7 @@ public class MQ_MANAGER {
 
     public boolean request(byte[] bytes)
     {
-        return this.reqSocket().send(bytes, 0);
+        return this.getRequestor().send(bytes, 0);
     }
 
     public byte[] response(long timeout) //[microsecs]
@@ -125,7 +125,7 @@ public class MQ_MANAGER {
         {
             if (MQ_MANAGER.poller.get().pollin(0))
             {
-                return this.reqSocket().recv(0);
+                return this.getRequestor().recv(0);
             }
             else
             {
@@ -141,7 +141,7 @@ public class MQ_MANAGER {
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    public ZMQ.Socket reqSocket()
+    public ZMQ.Socket getRequestor()
     {
         if (MQ_MANAGER.reqSocket.get() == null)
         {
@@ -153,7 +153,7 @@ public class MQ_MANAGER {
         return MQ_MANAGER.reqSocket.get();
     }
 
-    private ZMQ.Socket setReqSocketUri(String uri)
+    private ZMQ.Socket setRequestorUri(String uri)
     {
         if (this.reqSocketUri.compareTo(uri) != 0)
         {
@@ -163,23 +163,23 @@ public class MQ_MANAGER {
             this.reqSocketUri = uri;
         }
 
-        return this.reqSocket();
+        return this.getRequestor();
     }
 
-    private ZMQ.Socket setReqSocketHostAndPort(String host, long port)
+    private ZMQ.Socket setRequestorHostAndPort(String host, long port)
     {
-        return this.setReqSocketUri(String.format("%s:%d", host, port));
+        return this.setRequestorUri(String.format("%s:%d", host, port));
     }
 
-    public ZMQ.Socket setReqSocketPort(long port)
+    public ZMQ.Socket setRequestorPort(long port)
     {
-        return this.setReqSocketHostAndPort(reqSocketHost, port);
+        return this.setRequestorHostAndPort(requestorHost, port);
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    public ZMQ.Socket subSocket()
+    public ZMQ.Socket getSubscriber()
     {
         if (MQ_MANAGER.subSocket.get() == null)
         {
@@ -190,7 +190,7 @@ public class MQ_MANAGER {
         return MQ_MANAGER.subSocket.get();
     }
 
-    private ZMQ.Socket setSubSocketUri(String uri)
+    private ZMQ.Socket setSubscriberUri(String uri)
     {
         if (this.subSocketUri.compareTo(uri) != 0)
         {
@@ -199,17 +199,17 @@ public class MQ_MANAGER {
             this.subSocketUri = uri;
         }
 
-        return this.subSocket();
+        return this.getSubscriber();
     }
 
-    private ZMQ.Socket setSubSockertHostAndPort(String host, long port)
+    private ZMQ.Socket setSubscriberHostAndPort(String host, long port)
     {
-        return this.setSubSocketUri(String.format("%s:%d", host, port));
+        return this.setSubscriberUri(String.format("%s:%d", host, port));
     }
 
-    public ZMQ.Socket setSubSocketPort(long port) {
+    public ZMQ.Socket setSubscriberPort(long port) {
 
-        return this.setSubSockertHostAndPort(subSocketHost, port);
+        return this.setSubscriberHostAndPort(subscriberHost, port);
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////
