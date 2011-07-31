@@ -96,7 +96,7 @@ public final class RATE_EVENT_MANAGER extends EVENT_MANAGER {
 
                 if (event != null)
                 {
-                    if (event.match(rei)) //@TODO: Separate thread?
+                    if (event.match(rei))
                     {
                         event.handle(rei, this);
                     }

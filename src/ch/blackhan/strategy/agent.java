@@ -7,9 +7,9 @@ package ch.blackhan.strategy;
  */
 
 import ch.blackhan.core.*;
+import ch.blackhan.event.*;
 import ch.blackhan.core.models.*;
 import ch.blackhan.core.exceptions.*;
-import ch.blackhan.event.*;
 
 import java.util.*;
 import java.util.logging.*;
