@@ -1,5 +1,8 @@
 package ch.blackhan.core.models;
 
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
+
 public class TICK implements Cloneable {
 
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -27,14 +30,12 @@ public class TICK implements Cloneable {
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    @Override
-    public Object clone()
+    @Override public Object clone()
     {
         return new TICK(this.timestamp, this.bid, this.ask);
     }
 
-    @Override
-    public boolean equals(Object object)
+    @Override public boolean equals(Object object)
     {
         if (this != object)
         {
@@ -57,8 +58,7 @@ public class TICK implements Cloneable {
         }
     }
 
-    @Override
-    public int hashCode()
+    @Override public int hashCode()
     {
         return this.toString().hashCode(); //@TODO!
     }
@@ -97,8 +97,7 @@ public class TICK implements Cloneable {
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    @Override
-    public String toString()    
+    @Override public String toString()
     {
         return String.format(
             "[%.6f,%.6f] @ %d", this.bid, this.ask, this.timestamp

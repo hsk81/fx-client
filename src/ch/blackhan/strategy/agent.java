@@ -1,10 +1,11 @@
 package ch.blackhan.strategy;
 
 /**
- * This agent trades in 3 different fx.markets: It keeps buying A/B, selling
- * A/C and buying B/C. Buy establishing this triange it effectively hedges its
- * actual position agains any markets moves.
+ * @author Hasan Karahan <hasan.karahan81@gmail.com>
  */
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
 
 import ch.blackhan.core.*;
 import ch.blackhan.event.*;
@@ -16,8 +17,13 @@ import java.util.logging.*;
 import java.util.Observer;
 import java.util.Observable;
 
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
+
 /**
- * @author hkarahan
+ * This agent trades in 3 different fx.markets: It keeps buying A/B, selling A/C and buying
+ * B/C. Buy establishing this triange it effectively hedges its actual position agains any
+ * markets moves.
  */
 
 public class agent implements Observer {

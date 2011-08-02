@@ -1,6 +1,12 @@
 package ch.blackhan.core;
 
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
+
 import ch.blackhan.core.models.*;
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
 
 public final class RATE_EVENT_INFO extends EVENT_INFO {
 
@@ -32,8 +38,7 @@ public final class RATE_EVENT_INFO extends EVENT_INFO {
         return this.tick;
     }
 
-    @Override
-    public long getTimestamp()
+    @Override public long getTimestamp()
     {
         return this.getTick().getTimestamp();
     }
@@ -41,8 +46,7 @@ public final class RATE_EVENT_INFO extends EVENT_INFO {
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    @Override
-    public boolean equals(Object object)
+    @Override public boolean equals(Object object)
     {
         if (this != object)
         {
@@ -64,16 +68,14 @@ public final class RATE_EVENT_INFO extends EVENT_INFO {
         }
     }
 
-    @Override
-    public int hashCode()
+    @Override public int hashCode()
     {
         return String.format(
             "{0} {1}", this.getPair().toString(), this.getTick().toString() //@TODO!
         ).hashCode();
     }
 
-    @Override
-    public int compareTo(Object object)
+    @Override public int compareTo(Object object)
     {
         if (this != object)
         {
@@ -108,8 +110,7 @@ public final class RATE_EVENT_INFO extends EVENT_INFO {
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    @Override
-    public String toString()
+    @Override public String toString()
     {
         return String.format("%s %s", this.pair, this.tick);
     }

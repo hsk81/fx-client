@@ -3,12 +3,12 @@ package ch.blackhan.core.models;
 ///////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-public final class MARKET_ORDER extends ORDER implements Cloneable {
+public abstract class ORDER {
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    public MARKET_ORDER()
+    public ORDER()
     {
         throw new UnsupportedOperationException();
     }
@@ -16,38 +16,77 @@ public final class MARKET_ORDER extends ORDER implements Cloneable {
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    @Override public Object clone()
+    public double getHighPriceLimit()
+    {
+        throw new UnsupportedOperationException();
+    }
+    
+    public double getLowPriceLimit()
     {
         throw new UnsupportedOperationException();
     }
 
-    ///////////////////////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////////////////////////////////////////////////////////////
-
-    public MARKET_ORDER getClose()
+    public PAIR getPair()
     {
         throw new UnsupportedOperationException();
     }
 
-    public double getRealizedPL()
+    public double getPrice()
     {
         throw new UnsupportedOperationException();
     }
 
-    public int getTransactionLink() 
+    public STOP_LOSS_ORDER getStopLoss()
     {
         throw new UnsupportedOperationException();
     }
 
-    public double getUnrealizedPL(TICK tick)
+    public TAKE_PROFIT_ORDER getTakeProfit()
     {
         throw new UnsupportedOperationException();
     }
 
-    ///////////////////////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////////////////////////////////////////////////////////////
+    public long getTimestamp()
+    {
+        throw new UnsupportedOperationException();
+    }
 
-    @Override public String toString()
+    public int getTransactionNumber()
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    public long getUnits()
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    public void setHighPriceLimit(double limit)
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    public void setLowPriceLimit(double limit)
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    public void setPair(PAIR pair)
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    public void setStopLoss(STOP_LOSS_ORDER stoploss)
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    public void setTakeProfit(TAKE_PROFIT_ORDER takeprofit)
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    public void setUnits(long units)
     {
         throw new UnsupportedOperationException();
     }

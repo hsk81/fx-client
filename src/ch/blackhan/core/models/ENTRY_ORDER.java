@@ -1,29 +1,19 @@
-package ch.blackhan.core;
+package ch.blackhan.core.models;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-public abstract class ACCOUNT_EVENT extends EVENT {
+public abstract class ENTRY_ORDER extends ORDER {
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    public ACCOUNT_EVENT()
+    public ENTRY_ORDER()
     {
         throw new UnsupportedOperationException();
     }
 
-    public ACCOUNT_EVENT(boolean transientFlag)
-    {
-        throw new UnsupportedOperationException();
-    }
-
-    public ACCOUNT_EVENT(String key)
-    {
-        throw new UnsupportedOperationException();
-    }
-
-    public ACCOUNT_EVENT(String key, boolean transientFlag)
+    public ENTRY_ORDER(long expiry)
     {
         throw new UnsupportedOperationException();
     }
@@ -31,11 +21,20 @@ public abstract class ACCOUNT_EVENT extends EVENT {
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    @Override public boolean match(EVENT_INFO ei) {
+    public long getExpiry()
+    {
         throw new UnsupportedOperationException();
     }
 
-    @Override public abstract void handle(EVENT_INFO ei, EVENT_MANAGER em);
+    public void setExpiry(long expiry)
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    public void setPrice(double price)
+    {
+        throw new UnsupportedOperationException();
+    }
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////

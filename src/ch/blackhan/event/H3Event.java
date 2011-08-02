@@ -1,9 +1,11 @@
 package ch.blackhan.event;
 
 /**
- * Harvests currency triple if possible; if so, reduce triple size using the
- * realized profit.
+ * @author Hasan Karahan <hasan.karahan81@gmail.com>
  */
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
 
 import java.util.*;
 import java.util.logging.*;
@@ -12,12 +14,15 @@ import ch.blackhan.core.*;
 import ch.blackhan.core.models.*;
 import ch.blackhan.core.exceptions.*;
 
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
+
 /**
- * @author hkarahan
+ * Harvests currency triple if possible; if so, reduce triple size using the realized profit.
  */
 
-public class H3Event extends RATE_EVENT {
-
+public class H3Event extends RATE_EVENT
+{
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
 
@@ -41,8 +46,8 @@ public class H3Event extends RATE_EVENT {
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
     
-    public H3Event(ACCOUNT account, PAIR pair_st, PAIR pair_nd, PAIR pair_rd) {
-
+    public H3Event(ACCOUNT account, PAIR pair_st, PAIR pair_nd, PAIR pair_rd)
+    {
         this.account = account;
 
         this.st_pair = pair_st;
@@ -56,24 +61,19 @@ public class H3Event extends RATE_EVENT {
         this.rd_pair = pair_rd;
         this.rd_tick = null;
         this.rd_time = System.nanoTime();
-
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    @Override
-    public boolean match(EVENT_INFO ei) {
-
+    @Override public boolean match(EVENT_INFO ei)
+    {
         RATE_EVENT_INFO rei = (RATE_EVENT_INFO)ei;
 
-        //
-        // CHECK IF TICK FROM 1 OF 3 PAIRs (and APPLY TIME FILTER)
-        //
-
-        if (rei.getPair().compareTo(this.st_pair) == 0) {
-
-            if (System.nanoTime() - this.st_time < this.MODIFY_FREQUENCY) {
+        if (rei.getPair().compareTo(this.st_pair) == 0)
+        {
+            if (System.nanoTime() - this.st_time < this.MODIFY_FREQUENCY)
+            {
                 return false;
             }
 
@@ -83,9 +83,10 @@ public class H3Event extends RATE_EVENT {
             return true;
         }
 
-        if (rei.getPair().compareTo(this.nd_pair) == 0) {
-
-            if (System.nanoTime() - this.nd_time < this.MODIFY_FREQUENCY) {
+        if (rei.getPair().compareTo(this.nd_pair) == 0)
+        {
+            if (System.nanoTime() - this.nd_time < this.MODIFY_FREQUENCY)
+            {
                 return false;
             }
 
@@ -95,9 +96,10 @@ public class H3Event extends RATE_EVENT {
             return true;
         }
 
-        if (rei.getPair().compareTo(this.rd_pair) == 0) {
-
-            if (System.nanoTime() - this.rd_time < this.MODIFY_FREQUENCY) {
+        if (rei.getPair().compareTo(this.rd_pair) == 0)
+        {
+            if (System.nanoTime() - this.rd_time < this.MODIFY_FREQUENCY)
+            {
                 return false;
             }
 
@@ -113,97 +115,90 @@ public class H3Event extends RATE_EVENT {
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    public void handle(EVENT_INFO ei, EVENT_MANAGER em) {
-
-        if (!em.getEvents().contains(this)) {
+    public void handle(EVENT_INFO ei, EVENT_MANAGER em)
+    {
+        if (!em.getEvents().contains(this))
+        {
             return;
         }
 
-        //
-        // CAST FROM GENERAL TO SPECIFIC TYPE
-        //
-
         RATE_EVENT_INFO rei = (RATE_EVENT_INFO)ei;
 
-        //
-        // UPDATE CURRENCY TRIANGLE and EXECUTE EVTL. TRADEs
-        //
-
-        try {
-
+        try
+        {
             this.trade(this.account, rei);
-
-        } catch (FX_EXCEPTION ex) {
+        }
+        catch (FX_EXCEPTION ex)
+        {
             logger.log(Level.SEVERE, null, ex);
-
-            synchronized (this) {
-                em.remove(this);
-            } return;
+            synchronized (this) { em.remove(this); }
+            return;
         }
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
-    
+
+    /**
+     * Update currency triangle and execute eventual trades.
+     */
+
     private void trade(ACCOUNT account, RATE_EVENT_INFO rei)
         throws ACCOUNT_EXCEPTION, FX_EXCEPTION {
 
         MARKET_ORDER[] mos = null;
 
-        synchronized (account) {
-
+        synchronized (account)
+        {
             Vector<MARKET_ORDER> ts = account.getTrades();
             mos = new MARKET_ORDER[ts.size()];
             ts.copyInto(mos);
-
         }
 
-        for (MARKET_ORDER mo : mos) {
-
-            if (mo.getPair().compareTo(rei.getPair()) != 0) {
+        for (MARKET_ORDER mo : mos)
+        {
+            if (mo.getPair().compareTo(rei.getPair()) != 0)
+            {
                 continue;
             }
 
-            if (this.check(mo, rei.getTick())) {
-                
+            if (this.check(mo, rei.getTick()))
+            {
                 double old = this.account.getBalance();
-
-                synchronized (account) {
-                    account.close(mo);
-                }
-                
+                synchronized (account) { account.close(mo); }
                 this.reduce(account, mo, this.account.getBalance() - old);
             }
-
         }
     }
 
     private boolean check(MARKET_ORDER mo, TICK tick) {
 
-        if (tick == null) {
+        if (tick == null)
+        {
             return false;
         }
 
         double pnl = mo.getUnrealizedPL(tick);
 
-        if (pnl < 0.0) {
+        if (pnl < 0.0)
+        {
             return false;
         }
 
         double p0 = mo.getPrice();
         double p1 = pnl / (double)mo.getUnits();
 
-        if (p1 / p0 < this.SL_THRESHOLD) {
+        if (p1 / p0 < this.SL_THRESHOLD)
+        {
             return false;
         }
 
         return true;
     }
 
-    private void reduce(ACCOUNT account, MARKET_ORDER mo, double pnl) {
-
+    private void reduce(ACCOUNT account, MARKET_ORDER mo, double pnl)
+    {
         assert (account != null); //@TODO!
-        
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////

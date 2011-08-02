@@ -1,12 +1,14 @@
 package ch.blackhan.core;
 
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
+
 public final class ACCOUNT_EVENT_INFO extends EVENT_INFO   {
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    @Override
-    public long getTimestamp()
+    @Override public long getTimestamp()
     {
         throw new UnsupportedOperationException();
     }
@@ -14,8 +16,7 @@ public final class ACCOUNT_EVENT_INFO extends EVENT_INFO   {
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
     
-    @Override
-    public boolean equals(Object other)
+    @Override public boolean equals(Object other)
     {
         if (this != other)
         {
@@ -34,14 +35,12 @@ public final class ACCOUNT_EVENT_INFO extends EVENT_INFO   {
         }
     }
 
-    @Override
-    public int hashCode()
+    @Override public int hashCode()
     {
         throw new UnsupportedOperationException();
     }
 
-    @Override
-    public int compareTo(Object other)
+    @Override public int compareTo(Object other)
     {
         throw new UnsupportedOperationException();
     }
