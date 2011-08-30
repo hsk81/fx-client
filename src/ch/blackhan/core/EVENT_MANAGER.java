@@ -26,11 +26,12 @@ public abstract class EVENT_MANAGER extends Thread {
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
 
+    @SuppressWarnings({"unchecked"})
     public Vector<EVENT> getEvents()
     {
         synchronized(this.events)
         {
-            return (Vector<EVENT>)this.events.clone();
+            return (Vector<EVENT>) this.events.clone();
         }
     }
 

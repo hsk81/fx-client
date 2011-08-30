@@ -37,7 +37,7 @@ public class USER {
 
     public Vector<ACCOUNT> getAccounts() throws SESSION_EXCEPTION
     {
-        throw new UnsupportedOperationException();
+        return new Vector<ACCOUNT>(); //throw new UnsupportedOperationException();
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////
