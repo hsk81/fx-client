@@ -34,15 +34,14 @@ public final class KEEP_ALIVE_THREAD extends Thread {
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    String username = null;
-    String password = null;
-    String hostaddr = null;
+    private UUID sessionToken = null;
 
-    public KEEP_ALIVE_THREAD(String username, String password, String hostaddr)
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
+
+    public KEEP_ALIVE_THREAD(UUID sessionToken)
     {
-        this.username = username;
-        this.password = password;
-        this.hostaddr = hostaddr;
+        this.sessionToken = sessionToken;
     }
     
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -51,7 +50,7 @@ public final class KEEP_ALIVE_THREAD extends Thread {
     @Override public void run()
     {
         String req_message = String.format(
-            MESSAGE.CLIENT.REFRESH, this.username, this.password, this.hostaddr
+            MESSAGE.CLIENT.REFRESH, this.sessionToken
         );
 
         try
@@ -65,9 +64,7 @@ public final class KEEP_ALIVE_THREAD extends Thread {
                         rep_message.substring(req_message.length()), "|"
                     ).nextToken();
 
-                    if (result.compareTo("INVALID_USER_ERROR") == 0 ||
-                        result.compareTo("INVALID_PASSWORD_ERROR") == 0 ||
-                        result.compareTo("SESSION_ERROR") == 0)
+                    if (result.compareTo("SESSION_ERROR") == 0)
                     {
                         logger.log(Level.SEVERE, result); break;
                     }

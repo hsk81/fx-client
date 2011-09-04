@@ -109,7 +109,7 @@ public class agent implements Observer {
 
     private ACCOUNT getAccount(long accountId) {
         
-        ACCOUNT result = new ACCOUNT(); //null; @TODO!
+        ACCOUNT result = null;
         
         try {
             
@@ -121,6 +121,8 @@ public class agent implements Observer {
                     result = account;
                 }
             }
+
+            result = new ACCOUNT(me); //@TODO: Remove!
             
         } catch (SESSION_EXCEPTION ex) {
             logger.log(Level.SEVERE, null, ex);

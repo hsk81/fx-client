@@ -237,6 +237,7 @@ public class MQ_MANAGER {
         }
 
         MQ_MANAGER.context.term();
+        super.finalize();
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////

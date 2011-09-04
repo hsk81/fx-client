@@ -88,13 +88,17 @@ public class CLIENT extends Observable {
             {
                 if (this.user == null)
                 {
-                    this.user = new USER(username, password);
+                    this.user = new USER(st.nextToken());
+                }
+                else
+                {
+                    this.user.setSessionToken(st.nextToken());
                 }
 
                 if (this.withKeepAliveThread && CLIENT.keep_alive_thread == null)
                 {
                     CLIENT.keep_alive_thread = new KEEP_ALIVE_THREAD(
-                        username, password, this.getHostAddress()
+                        this.user.getSessionToken()
                     );
 
                     CLIENT.keep_alive_thread.start();
@@ -127,11 +131,8 @@ public class CLIENT extends Observable {
 
                 CLIENT.keep_alive_thread = null;
 
-                String username = this.user.getUserName();
-                String password = this.user.getPassword();
-
                 this.mqm.communicate(String.format(
-                    MESSAGE.CLIENT.LOGOUT, username, password, this.getHostAddress()
+                    MESSAGE.CLIENT.LOGOUT, this.user.getSessionToken()
                 ));
 
                 this.user = null;
