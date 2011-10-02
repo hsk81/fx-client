@@ -22,7 +22,7 @@ import java.util.Observable;
 
 /**
  * This agent trades in 3 different fx.markets: It keeps buying A/B, selling A/C and buying
- * B/C. Buy establishing this triange it effectively hedges its actual position agains any
+ * B/C. Buy establishing this triangle it effectively hedges its actual position for any
  * markets moves.
  */
 
@@ -121,8 +121,6 @@ public class agent implements Observer {
                     result = account;
                 }
             }
-
-            result = new ACCOUNT(me); //@TODO: Remove!
             
         } catch (SESSION_EXCEPTION ex) {
             logger.log(Level.SEVERE, null, ex);

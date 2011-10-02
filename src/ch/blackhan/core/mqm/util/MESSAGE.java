@@ -39,7 +39,19 @@ public class MESSAGE {
 
     public class USER
     {
+        public static final String GET_INFO = "USER|get_info|%s";
+        public static final String SET_PROFILE = "USER|set_profile|%s|%s";
         public static final String GET_ACCOUNTS = "USER|get_accounts|%s";
+        public static final String GET_ACCOUNT = "USER|get_accounts|%s|%s";
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
+
+    public class ACCOUNT
+    {
+        public static final String GET_INFO = "ACCOUNT|get_info|%s|%s";
+        public static final String SET_PROFILE = "USER|set_profile|%s|%s";
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////
