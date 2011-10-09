@@ -5,6 +5,7 @@ package ch.blackhan.core.models;
 
 import java.util.*;
 
+import ch.blackhan.*;
 import ch.blackhan.core.mqm.*;
 import ch.blackhan.core.mqm.util.*;
 import ch.blackhan.core.exceptions.*;
@@ -21,12 +22,12 @@ public class USER {
 
     public class INFO
     {
-        public int userId;
-        public String userName;
+        public Long id;
+        public String username;
         public String address;
-        public long createDate;
+        public Long insertDate;
         public String email;
-        public String name;
+        public String fullname;
         public String password;
         public String telephone;
         public String profile;
@@ -53,26 +54,26 @@ public class USER {
     {
         String req = String.format(MESSAGE.USER.GET_INFO, this.sessionToken);
         String rep = this.mqm.communicate(req);
-        StringTokenizer st = new StringTokenizer(rep.substring(req.length()), "|");
+        DefaultTokenizer st = new DefaultTokenizer(rep.substring(req.length()), "|", "None");
 
-        String result = st.nextToken();
-        if (result.compareTo("SESSION_ERROR") == 0)
+        String result = st.nextTokenOrDefault(true);
+        if (result == null || result.compareTo("SESSION_ERROR") == 0)
         {
             throw new SESSION_EXCEPTION(this.sessionToken.toString());
         }
         else
         {
             INFO nfo = new INFO();
-            
-            nfo.userId = Integer.parseInt(st.nextToken());
-            nfo.userName = st.nextToken();
-            nfo.address = st.nextToken();
-            nfo.createDate = Long.parseLong(st.nextToken());
-            nfo.email = st.nextToken();
-            nfo.name = st.nextToken();
-            nfo.password = st.nextToken();
-            nfo.telephone = st.nextToken();
-            nfo.profile = st.nextToken();
+
+            nfo.id = st.nextLongOrDefault();
+            nfo.username = st.nextStringOrDefault();
+            nfo.address = st.nextStringOrDefault();
+            nfo.insertDate = st.nextLongOrDefault();
+            nfo.email = st.nextStringOrDefault();
+            nfo.fullname = st.nextStringOrDefault();
+            nfo.password = st.nextStringOrDefault();
+            nfo.telephone = st.nextStringOrDefault();
+            nfo.profile = st.nextStringOrDefault();
 
             return nfo;
         }
@@ -85,10 +86,10 @@ public class USER {
     {
         String req = String.format(MESSAGE.USER.GET_ACCOUNTS, this.sessionToken);
         String rep = this.mqm.communicate(req);
-        StringTokenizer st = new StringTokenizer(rep.substring(req.length()), "|");
+        DefaultTokenizer st = new DefaultTokenizer(rep.substring(req.length()), "|", "None");
 
-        String result = st.nextToken();
-        if (result.compareTo("SESSION_ERROR") == 0)
+        String result = st.nextTokenOrDefault(true);
+        if (result == null || result.compareTo("SESSION_ERROR") == 0)
         {
             throw new SESSION_EXCEPTION(this.sessionToken.toString());
         }
@@ -98,7 +99,7 @@ public class USER {
 
             while (st.hasMoreTokens())
             {
-                int accountId = Integer.parseInt(st.nextToken());
+                Integer accountId = st.nextIntegerOrDefault();
                 ACCOUNT account = new ACCOUNT(this.sessionToken, accountId);
                 accounts.add(account);
             }
@@ -113,10 +114,10 @@ public class USER {
 
         String req = String.format(MESSAGE.USER.GET_ACCOUNT, this.sessionToken, accountId);
         String rep = this.mqm.communicate(req);
-        StringTokenizer st = new StringTokenizer(rep.substring(req.length()), "|");
+        DefaultTokenizer st = new DefaultTokenizer(rep.substring(req.length()), "|", "None");
 
-        String result = st.nextToken();
-        if (result.compareTo("SESSION_ERROR") == 0)
+        String result = st.nextTokenOrDefault(true);
+        if (result == null || result.compareTo("SESSION_ERROR") == 0)
         {
             throw new SESSION_EXCEPTION(this.sessionToken.toString());
         }
@@ -132,15 +133,15 @@ public class USER {
 
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    public int getUserId()
+    public long getUserId()
     {
-        return this.info.userId;
+        return this.info.id;
     }
 
     
     public String getUserName()
     {
-        return this.info.userName;
+        return this.info.username;
     }
 
     public String getPassword()
@@ -150,14 +151,14 @@ public class USER {
 
     public long getCreateDate()
     {
-        return this.info.createDate;
+        return this.info.insertDate;
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////
 
     public String getName()
     {
-        return this.info.name;
+        return this.info.fullname;
     }
 
     public String getAddress()
@@ -188,10 +189,10 @@ public class USER {
 
         String req = String.format(MESSAGE.USER.SET_PROFILE, this.sessionToken, profile);
         String rep = this.mqm.communicate(req);
-        StringTokenizer st = new StringTokenizer(rep.substring(req.length()), "|");
+        DefaultTokenizer st = new DefaultTokenizer(rep.substring(req.length()), "|", "None");
 
-        String result = st.nextToken();
-        if (result.compareTo("SESSION_ERROR") == 0)
+        String result = st.nextTokenOrDefault(true);
+        if (result == null || result.compareTo("SESSION_ERROR") == 0)
         {
             throw new SESSION_EXCEPTION(this.sessionToken.toString());
         }
@@ -211,6 +212,8 @@ public class USER {
 
     public final void setSessionToken(String sessionToken) throws SESSION_EXCEPTION
     {
+        if (sessionToken == null) throw new IllegalArgumentException("sessionToken");
+        
         try
         {
             this.sessionToken = UUID.fromString(sessionToken);

@@ -7,6 +7,7 @@ import java.net.*;
 import java.util.*;
 import java.util.logging.*;
 
+import ch.blackhan.*;
 import ch.blackhan.core.mqm.*;
 import ch.blackhan.core.models.*;
 import ch.blackhan.core.mqm.util.*;
@@ -18,14 +19,7 @@ import ch.blackhan.core.models.util.*;
 
 public class CLIENT extends Observable {
 
-    ///////////////////////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////////////////////////////////////////////////////////////
-
     protected static final Logger logger = Logger.getLogger(CLIENT.class.getName());
-
-    ///////////////////////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////////////////////////////////////////////////////////////
-
     protected final MQ_MANAGER mqm = MQ_MANAGER.unique;
 
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -61,18 +55,22 @@ public class CLIENT extends Observable {
     {
         synchronized (this)
         {
-            String req_message = String.format(
-                MESSAGE.CLIENT.LOGIN, username, password, this.getHostAddress()
+            String req = String.format(
+                MESSAGE.CLIENT.LOGIN, username, password, getHostAddress()
             );
 
-            String rep_message = this.mqm.communicate(req_message);
+            String rep = this.mqm.communicate(req);
 
-            StringTokenizer st = new StringTokenizer(
-                rep_message.substring(req_message.length()), "|"
+            DefaultTokenizer st = new DefaultTokenizer(rep.substring(
+                req.length()), "|", "None"
             );
 
-            String result = st.nextToken();
-            if (result.compareTo("INVALID_USER_ERROR") == 0)
+            String result = st.nextTokenOrDefault(false);
+            if (result == null || result.compareTo("SESSION_ERROR") == 0)
+            {
+                throw new SESSION_EXCEPTION(this.getHostAddress());
+            }
+            else if (result.compareTo("INVALID_USER_ERROR") == 0)
             {
                 throw new INVALID_USER_EXCEPTION(username);
             }
@@ -80,19 +78,15 @@ public class CLIENT extends Observable {
             {
                 throw new INVALID_PASSWORD_EXCEPTION(password);
             }
-            else if (result.compareTo("SESSION_ERROR") == 0)
-            {
-                throw new SESSION_EXCEPTION(this.getHostAddress());
-            }
             else
             {
                 if (this.user == null)
                 {
-                    this.user = new USER(st.nextToken());
+                    this.user = new USER(st.nextStringOrDefault());
                 }
                 else
                 {
-                    this.user.setSessionToken(st.nextToken());
+                    this.user.setSessionToken(st.nextStringOrDefault());
                 }
 
                 if (this.withKeepAliveThread && CLIENT.keep_alive_thread == null)
@@ -219,16 +213,13 @@ public class CLIENT extends Observable {
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    public long getServerTime()
+    public Long getServerTime()
     {
-        String req_message = String.format(MESSAGE.CLIENT.GET_SERVER_TIME);
-        String rep_message = this.mqm.communicate(req_message);
- 
-        StringTokenizer st = new StringTokenizer(
-            rep_message.substring(req_message.length()), "|"
-        );
+        String req = String.format(MESSAGE.CLIENT.GET_SERVER_TIME);
+        String rep = this.mqm.communicate(req);
+        DefaultTokenizer st = new DefaultTokenizer(rep.substring(req.length()), "|", "None");
 
-        return Long.parseLong(st.nextToken());
+        return st.nextLongOrDefault();
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////

@@ -5,6 +5,7 @@ package ch.blackhan.core.models;
 
 import java.util.*;
 
+import ch.blackhan.*;
 import ch.blackhan.core.*;
 import ch.blackhan.core.mqm.*;
 import ch.blackhan.core.mqm.util.*;
@@ -22,13 +23,13 @@ public class ACCOUNT {
 
     public class INFO
     {
-        public long accountId;
-        public String accountName;
-        public long createDate;
+        public Long id;
+        public String name;
+        public Long createDate;
         public String homeCurrency;
         public String profile;
-        public double marginCallRate;
-        public double marginRate;
+        public Double marginCallRate;
+        public Double marginRate;
     }
 
     private INFO info = null;
@@ -55,10 +56,10 @@ public class ACCOUNT {
 
         String req = String.format(MESSAGE.ACCOUNT.GET_INFO, this.sessionToken, accountId);
         String rep = this.mqm.communicate(req);
-        StringTokenizer st = new StringTokenizer(rep.substring(req.length()), "|");
+        DefaultTokenizer st = new DefaultTokenizer(rep.substring(req.length()), "|", "None");
 
-        String result = st.nextToken();
-        if (result.compareTo("SESSION_ERROR") == 0)
+        String result = st.nextTokenOrDefault(true);
+        if (result == null || result.compareTo("SESSION_ERROR") == 0)
         {
             throw new SESSION_EXCEPTION(this.sessionToken.toString());
         }
@@ -66,13 +67,13 @@ public class ACCOUNT {
         {
             INFO nfo = new INFO();
 
-            nfo.accountId = Integer.parseInt(st.nextToken());
-            nfo.accountName = st.nextToken();
-            nfo.createDate = Long.parseLong(st.nextToken());
-            nfo.homeCurrency = st.nextToken();
-            nfo.profile = st.nextToken();
-            nfo.marginCallRate = Double.parseDouble(st.nextToken());
-            nfo.marginRate = Double.parseDouble(st.nextToken());
+            nfo.id = st.nextLongOrDefault();
+            nfo.name = st.nextStringOrDefault();
+            nfo.createDate = st.nextLongOrDefault();
+            nfo.homeCurrency = st.nextStringOrDefault();
+            nfo.profile = st.nextStringOrDefault();
+            nfo.marginCallRate = st.nextDoubleOrDefault();
+            nfo.marginRate = st.nextDoubleOrDefault();
 
             return nfo;
         }
@@ -91,12 +92,12 @@ public class ACCOUNT {
 
     public long getAccountId()
     {
-        return this.info.accountId;
+        return this.info.id;
     }
 
     public String getAccountName()
     {
-        return this.info.accountName;
+        return this.info.name;
     }
 
     public long getCreateDate()
@@ -122,10 +123,10 @@ public class ACCOUNT {
 
         String req = String.format(MESSAGE.ACCOUNT.SET_PROFILE, this.sessionToken, profile);
         String rep = this.mqm.communicate(req);
-        StringTokenizer st = new StringTokenizer(rep.substring(req.length()), "|");
+        DefaultTokenizer st = new DefaultTokenizer(rep.substring(req.length()), "|", "None");
 
-        String result = st.nextToken();
-        if (result.compareTo("SESSION_ERROR") == 0)
+        String result = st.nextTokenOrDefault(true);
+        if (result == null || result.compareTo("SESSION_ERROR") == 0)
         {
             throw new SESSION_EXCEPTION(this.sessionToken.toString());
         }
@@ -275,7 +276,7 @@ public class ACCOUNT {
 
     @Override public String toString()
     {
-        return this.info.accountName;
+        return this.info.name;
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////
