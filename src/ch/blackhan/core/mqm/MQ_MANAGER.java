@@ -42,8 +42,7 @@ public class MQ_MANAGER {
         requestorHost, requestorPort, subscriberHost, subscriberPort
     );
 
-    private MQ_MANAGER(
-        String reqHost, long reqPort, String subHost, long subPort)
+    private MQ_MANAGER(String reqHost, long reqPort, String subHost, long subPort)
     {
         this.reqSocketUri = String.format("%s:%d", reqHost, reqPort);
         this.subSocketUri = String.format("%s:%d", subHost, subPort);
@@ -64,7 +63,7 @@ public class MQ_MANAGER {
         return this.communicate(req_message, this.timeout);
     }
 
-    public String communicate(String req_message, long timeout) //[microsecs]
+    public String communicate(String req_message, long timeout) // [microsecs]
     {
         if (req_message != null)
         {
@@ -82,13 +81,13 @@ public class MQ_MANAGER {
                     {
                         if (rep_message.startsWith("EXCEPTION"))
                         {
-                            throw new UnsupportedOperationException(
+                            throw new AssertionError(
                                 new SERVER_EXCEPTION(rep_message)
                             );
                         }
                         else
                         {
-                            throw new UnsupportedOperationException(
+                            throw new AssertionError(
                                 new RESPONSE_EXCEPTION(rep_message)
                             );
                         }
@@ -96,21 +95,21 @@ public class MQ_MANAGER {
                 }
                 else
                 {
-                    throw new UnsupportedOperationException(
+                    throw new AssertionError(
                         new RESPONSE_ISNULL_EXCEPTION(req_message)
                     );
                 }
             }
             else
             {
-                throw new UnsupportedOperationException(
+                throw new AssertionError(
                     new REQUEST_EXCEPTION(req_message)
                 );
             }
         }
         else
         {
-            throw new UnsupportedOperationException(
+            throw new AssertionError(
                 new REQUEST_ISNULL_EXCEPTION(req_message)
             );
         }
@@ -124,7 +123,7 @@ public class MQ_MANAGER {
         return this.getRequestor().send(bytes, 0);
     }
 
-    public byte[] response(long timeout) //[microsecs]
+    public byte[] response(long timeout) // [microsecs]
     {
         long noo = MQ_MANAGER.poller.get().poll(timeout);
         if (noo > 0)
@@ -166,6 +165,7 @@ public class MQ_MANAGER {
             MQ_MANAGER.poller.get().unregister(MQ_MANAGER.reqSocket.get());
             MQ_MANAGER.reqSocket.get().close();
             MQ_MANAGER.reqSocket.set(null);
+            
             this.reqSocketUri = uri;
         }
 
@@ -202,6 +202,7 @@ public class MQ_MANAGER {
         {
             MQ_MANAGER.subSocket.get().close();
             MQ_MANAGER.subSocket.set(null);
+            
             this.subSocketUri = uri;
         }
 

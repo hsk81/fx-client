@@ -16,14 +16,7 @@ import org.zeromq.ZMQ;
 
 public final class RATE_EVENT_MANAGER extends EVENT_MANAGER {
 
-    ///////////////////////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////////////////////////////////////////////////////////////
-
-    static final Logger logger = Logger.getLogger(RATE_EVENT_MANAGER.class.getName());
-
-    ///////////////////////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////////////////////////////////////////////////////////////
-
+    protected static final Logger logger = Logger.getLogger(RATE_EVENT_MANAGER.class.getName());
     protected final MQ_MANAGER mqm = MQ_MANAGER.unique;
     
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -42,7 +35,7 @@ public final class RATE_EVENT_MANAGER extends EVENT_MANAGER {
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    @Override protected void finalize()
+    @Override protected void finalize() throws Throwable
     {
         if (this.subSocket != null)
         {
@@ -52,6 +45,8 @@ public final class RATE_EVENT_MANAGER extends EVENT_MANAGER {
 
             this.subSocket.close(); this.subSocket = null;
         }
+
+        super.finalize();
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -83,7 +78,6 @@ public final class RATE_EVENT_MANAGER extends EVENT_MANAGER {
             );
 
             logger.log(Level.INFO, rei.toString());
-            
             index = 0; while (true)
             {
                 event = null; synchronized (this.events)

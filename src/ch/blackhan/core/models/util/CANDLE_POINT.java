@@ -8,9 +8,9 @@ public class CANDLE_POINT implements Cloneable {
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    long timestamp;
-    double open, close;
-    double min, max;
+    private long timestamp;
+    private double open, close;
+    private double min, max;
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -20,8 +20,7 @@ public class CANDLE_POINT implements Cloneable {
         // pass
     }
 
-    public CANDLE_POINT(long timestamp,
-        double open, double close, double min, double max)
+    public CANDLE_POINT(long timestamp, double open, double close, double min, double max)
     {
         this.timestamp = timestamp;
         this.open = open;
@@ -35,9 +34,7 @@ public class CANDLE_POINT implements Cloneable {
 
     @Override public Object clone()
     {
-        return new CANDLE_POINT(this.timestamp,
-            this.open, this.close, this.min, this.max
-        );
+        return new CANDLE_POINT(this.timestamp, this.open, this.close, this.min, this.max);
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////

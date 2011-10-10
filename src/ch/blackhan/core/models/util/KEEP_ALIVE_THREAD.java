@@ -6,6 +6,7 @@ package ch.blackhan.core.models.util;
 import java.util.*;
 import java.util.logging.*;
 
+import ch.blackhan.*;
 import ch.blackhan.core.mqm.*;
 import ch.blackhan.core.mqm.util.*;
 import ch.blackhan.core.mqm.exception.*;
@@ -15,21 +16,14 @@ import ch.blackhan.core.mqm.exception.*;
 
 public final class KEEP_ALIVE_THREAD extends Thread {
 
-    ///////////////////////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////////////////////////////////////////////////////////////
-
     protected static final Logger logger = Logger.getLogger(KEEP_ALIVE_THREAD.class.getName());
-
-    ///////////////////////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////////////////////////////////////////////////////////////
-
     protected final MQ_MANAGER mqm = MQ_MANAGER.unique;
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
 
     public static final long timeout = -1L; // indefinite [microsecs]
-    public static final long refresh_rate = 1 << 16; //[ms]
+    public static final long refresh_rate = 1 << 16; // [ms]
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -49,24 +43,23 @@ public final class KEEP_ALIVE_THREAD extends Thread {
 
     @Override public void run()
     {
-        String req_message = String.format(
-            MESSAGE.CLIENT.REFRESH, this.sessionToken
-        );
-
+        String req = String.format(MESSAGE.CLIENT.REFRESH, this.sessionToken);
         try
         {
             while (true)
             {
-                String rep_message = this.mqm.communicate(req_message, timeout);
-                if (rep_message != null)
+                String rep = this.mqm.communicate(req, timeout);
+                if (rep != null)
                 {
-                    String result = new StringTokenizer(
-                        rep_message.substring(req_message.length()), "|"
-                    ).nextToken();
+                    DefaultTokenizer st = new DefaultTokenizer(
+                        rep.substring(req.length()), "|", "None"
+                    );
 
-                    if (result.compareTo("SESSION_ERROR") == 0)
+                    String result = st.nextStringOrDefault();
+                    if (result == null || result.compareTo("SESSION_ERROR") == 0)
                     {
-                        logger.log(Level.SEVERE, result); break;
+                        logger.log(Level.SEVERE, result);
+                        break;
                     }
                     else
                     {
@@ -85,9 +78,8 @@ public final class KEEP_ALIVE_THREAD extends Thread {
                 }
                 else
                 {
-                    logger.log(Level.SEVERE, null,
-                        new RESPONSE_ISNULL_EXCEPTION(req_message)
-                    ); break;
+                    logger.log(Level.SEVERE, null, new RESPONSE_ISNULL_EXCEPTION(req));
+                    break;
                 }
             }
         }

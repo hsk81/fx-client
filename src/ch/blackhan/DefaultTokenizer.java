@@ -74,6 +74,12 @@ public class DefaultTokenizer extends StringTokenizer {
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
 
+    public Boolean nextBooleanOrDefault()
+    {
+        return this.nextTokenOrDefault() != null
+            ? Boolean.parseBoolean(this.lastToken) : null;
+    }
+
     public Short nextShortOrDefault()
     {
         return this.nextTokenOrDefault() != null
@@ -106,6 +112,12 @@ public class DefaultTokenizer extends StringTokenizer {
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
+
+    public Boolean nextBooleanOrDefault(String defaultToken)
+    {
+        return this.nextTokenOrDefault(defaultToken) != null
+            ? Boolean.parseBoolean(this.lastToken) : null;
+    }
 
     public Short nextShortOrDefault(String defaultToken)
     {
@@ -140,14 +152,12 @@ public class DefaultTokenizer extends StringTokenizer {
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    @Override
-    public boolean hasMoreTokens()
+    @Override public boolean hasMoreTokens()
     {
         return this.keepToken || super.hasMoreTokens();
     }
 
-    @Override
-    public String toString()
+    @Override public String toString()
     {
         return this.lastToken;
     }

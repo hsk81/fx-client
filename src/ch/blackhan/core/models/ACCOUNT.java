@@ -67,7 +67,7 @@ public class ACCOUNT {
         {
             INFO nfo = new INFO();
 
-            nfo.id = st.nextLongOrDefault();
+            nfo.id = accountId;
             nfo.name = st.nextStringOrDefault();
             nfo.createDate = st.nextLongOrDefault();
             nfo.homeCurrency = st.nextStringOrDefault();
@@ -82,9 +82,20 @@ public class ACCOUNT {
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    public EVENT_MANAGER getEventManager() throws ACCOUNT_EXCEPTION
+    private ACCOUNT_EVENT_MANAGER eventManager = null;
+    public EVENT_MANAGER getEventManager()
     {
-        throw new UnsupportedOperationException(); //@TODO!
+        if (this.eventManager != null)
+        {
+            return this.eventManager;
+        }
+        else
+        {
+            this.eventManager = new ACCOUNT_EVENT_MANAGER();
+            this.eventManager.start();
+
+            return this.eventManager;
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////
