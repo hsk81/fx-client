@@ -170,27 +170,14 @@ public class H3Event extends RATE_EVENT
 
     private boolean check(MARKET_ORDER mo, TICK tick)
     {
-        if (tick == null)
-        {
-            return false;
-        }
-
+        if (tick == null) return false;
         double pnl = mo.getUnrealizedPL(tick);
-
-        if (pnl < 0.0)
-        {
-            return false;
-        }
+        if (pnl < 0.0) return false;
 
         double p0 = mo.getPrice();
         double p1 = pnl / (double)mo.getUnits();
 
-        if (p1 / p0 < this.SL_THRESHOLD)
-        {
-            return false;
-        }
-
-        return true;
+        return (p1 / p0 >= this.SL_THRESHOLD);
     }
 
     private void reduce(ACCOUNT account, MARKET_ORDER mo, double pnl)

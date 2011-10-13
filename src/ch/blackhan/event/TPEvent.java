@@ -215,7 +215,7 @@ public class TPEvent extends RATE_EVENT
             );
         }
         
-        execute(this.account, mkt, em);
+        this.execute(this.account, mkt, em);
     }
     
     ///////////////////////////////////////////////////////////////////////////////////////////
