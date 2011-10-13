@@ -44,13 +44,24 @@ public class TPEvent extends RATE_EVENT
     double price_st, price_nd, price_rd;
     long st_time, nd_time, rd_time;
     
-    int direction;
-    
-    ///////////////////////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////////////////////////////////////////////////////////////
-    
-    public TPEvent(ACCOUNT account, int direction, PAIR pair_st, PAIR pair_nd, PAIR pair_rd)
+    public enum Direction
     {
+        Positive, Negative
+    }
+
+    Direction direction;
+    
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
+
+    public TPEvent(ACCOUNT account, Direction direction,
+        PAIR pair_st, PAIR pair_nd, PAIR pair_rd)
+    {
+        if (account == null) throw new IllegalArgumentException("account");
+        if (pair_st == null) throw new IllegalArgumentException("pair_st");
+        if (pair_nd == null) throw new IllegalArgumentException("pair_nd");
+        if (pair_rd == null) throw new IllegalArgumentException("pair_rd");
+
         this.account = account;
         
         this.pair_st = pair_st; this.st_time = System.nanoTime();
@@ -112,18 +123,21 @@ public class TPEvent extends RATE_EVENT
         {
             return;
         }
+        
+        switch (this.direction)
+        {
+            case Positive:
+                this.handle_pos(ei,em);
+                break;
 
-        if (this.direction > 0)
-        {
-            this.handle_pos(ei,em);
-        } 
-        else if (this.direction < 0)
-        {
-            this.handle_neg(ei,em);
-        }
-        else
-        {
-            return;
+            case Negative:
+                this.handle_neg(ei,em);
+                break;
+
+            default:
+                throw new IllegalStateException(String.format(
+                    "%s.%s", Direction.class.getName(), this.direction
+                ));
         }
     }
     

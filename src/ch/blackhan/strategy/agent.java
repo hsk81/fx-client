@@ -21,8 +21,8 @@ import java.util.Observable;
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * This agent trades in 3 different fx.markets: It keeps buying A/B, selling A/C and buying
- * B/C. Buy establishing this triangle it effectively hedges its actual position for any
+ * This agent trades in 3 different currency markets: It keeps buying A/B, selling A/C and
+ * buying B/C. Buy establishing this triangle it effectively hedges its actual position for any
  * markets moves.
  */
 
@@ -162,10 +162,9 @@ public class agent implements Observer {
                 // REGISTER SOME EVENTs TO BE HANDLED
                 //
 
-                H3Event h3e = new H3Event (this.accLG,
-                      this.pair_st, this.pair_nd, this.pair_rd);
-
-                this.rateTable.getEventManager().add(h3e);
+                this.rateTable.getEventManager().add(new TPEvent (this.accLG, 
+                    TPEvent.Direction.Positive, this.pair_st, this.pair_nd, this.pair_rd
+                ));
 
                 //
                 // RE-ACTIVATE OBSERVER PATTERN

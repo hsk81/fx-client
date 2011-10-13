@@ -45,6 +45,11 @@ public class H3Event extends RATE_EVENT
     
     public H3Event(ACCOUNT account, PAIR pair_st, PAIR pair_nd, PAIR pair_rd)
     {
+        if (account == null) throw new IllegalArgumentException("account");
+        if (pair_st == null) throw new IllegalArgumentException("pair_st");
+        if (pair_nd == null) throw new IllegalArgumentException("pair_nd");
+        if (pair_rd == null) throw new IllegalArgumentException("pair_rd");
+
         this.account = account;
 
         this.st_pair = pair_st;
