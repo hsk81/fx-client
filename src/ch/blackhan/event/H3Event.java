@@ -140,9 +140,9 @@ public class H3Event extends RATE_EVENT
      * Update currency triangle and execute eventual trades.
      */
 
-    private void trade(ACCOUNT account, RATE_EVENT_INFO rei)
-        throws ACCOUNT_EXCEPTION, FX_EXCEPTION {
-
+    private void trade(ACCOUNT account, RATE_EVENT_INFO rei) 
+        throws ACCOUNT_EXCEPTION, FX_EXCEPTION
+    {
         MARKET_ORDER[] mos = null;
 
         synchronized (account)
@@ -168,8 +168,8 @@ public class H3Event extends RATE_EVENT
         }
     }
 
-    private boolean check(MARKET_ORDER mo, TICK tick) {
-
+    private boolean check(MARKET_ORDER mo, TICK tick)
+    {
         if (tick == null)
         {
             return false;
