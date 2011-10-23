@@ -144,7 +144,9 @@ public class agent implements Observer {
                 //
 
                 this.accLG = this.getAccount(this.LG_ACCOUNT_ID);
+                if (this.accLG == null) throw new NullPointerException("this.accLG");
                 this.accSH = this.getAccount(this.SH_ACCOUNT_ID);
+                if (this.accSH == null) throw new NullPointerException("this.accSH");
 
                 //
                 // SETUP EVENT MANAGEMENT
