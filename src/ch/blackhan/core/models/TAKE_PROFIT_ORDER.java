@@ -10,12 +10,12 @@ public final class TAKE_PROFIT_ORDER extends ORDER implements Cloneable {
 
     public TAKE_PROFIT_ORDER()
     {
-        throw new UnsupportedOperationException();
+        // pass
     }
 
     public TAKE_PROFIT_ORDER(double price)
     {
-        throw new UnsupportedOperationException();
+        this.price = price;
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -23,7 +23,7 @@ public final class TAKE_PROFIT_ORDER extends ORDER implements Cloneable {
 
     @Override public Object clone()
     {
-        throw new UnsupportedOperationException();
+        return this.clone();
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -31,7 +31,7 @@ public final class TAKE_PROFIT_ORDER extends ORDER implements Cloneable {
 
     @Override public String toString()
     {
-        throw new UnsupportedOperationException();
+        return super.toString();
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////

@@ -3,14 +3,21 @@ package ch.blackhan.core.models;
 ///////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-public final class MARKET_ORDER extends ORDER implements Cloneable {
+public final class MARKET_ORDER extends ORDER implements Cloneable
+{
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    
+    private double realizedPL;
+    private int transactionLink;
+    private MARKET_ORDER closeOrder;
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
 
     public MARKET_ORDER()
     {
-        throw new UnsupportedOperationException();
+        // pass
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -18,7 +25,7 @@ public final class MARKET_ORDER extends ORDER implements Cloneable {
 
     @Override public Object clone()
     {
-        throw new UnsupportedOperationException();
+        return this.clone();
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -26,22 +33,22 @@ public final class MARKET_ORDER extends ORDER implements Cloneable {
 
     public MARKET_ORDER getClose()
     {
-        throw new UnsupportedOperationException();
+        return this.closeOrder;
     }
 
     public double getRealizedPL()
     {
-        throw new UnsupportedOperationException();
+        return this.realizedPL;
     }
 
     public int getTransactionLink() 
     {
-        throw new UnsupportedOperationException();
+        return this.transactionLink;
     }
 
     public double getUnrealizedPL(TICK tick)
     {
-        throw new UnsupportedOperationException();
+        return (tick.getBid() - this.price) * this.units; //TODO: Verify!
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -49,7 +56,7 @@ public final class MARKET_ORDER extends ORDER implements Cloneable {
 
     @Override public String toString()
     {
-        throw new UnsupportedOperationException();
+        return super.toString();
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////

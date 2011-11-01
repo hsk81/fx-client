@@ -5,90 +5,55 @@ package ch.blackhan.core.models;
 
 public abstract class ORDER {
 
+    protected PAIR pair;
+    protected long units;
+    protected double price;
+    protected long timestamp;
+    protected int transactionNumber;
+    protected TAKE_PROFIT_ORDER takeProfitOrder;
+    protected STOP_LOSS_ORDER stopLossOrder;
+    protected double lowPriceLimit;
+    protected double highPriceLimit;
+
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
 
     public ORDER()
     {
-        throw new UnsupportedOperationException();
+        // pass
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    public double getHighPriceLimit()
-    {
-        throw new UnsupportedOperationException();
-    }
-    
-    public double getLowPriceLimit()
-    {
-        throw new UnsupportedOperationException();
-    }
+    public PAIR getPair() { return this.pair; }
+    public void setPair(PAIR value) { this.pair = value; }
 
-    public PAIR getPair()
-    {
-        throw new UnsupportedOperationException();
-    }
+    public long getUnits() { return this.units; }
+    public void setUnits(long value) { this.units = value; }
 
-    public double getPrice()
-    {
-        throw new UnsupportedOperationException();
-    }
+    public double getPrice() { return this.price; }
+    public long getTimestamp() { return this.timestamp; }
+    public int getTransactionNumber() { return this.transactionNumber; }
 
-    public STOP_LOSS_ORDER getStopLoss()
-    {
-        throw new UnsupportedOperationException();
-    }
+    public double getHighPriceLimit() { return this.highPriceLimit; }
+    public void setHighPriceLimit(double value) { this.highPriceLimit = value; }
 
-    public TAKE_PROFIT_ORDER getTakeProfit()
-    {
-        throw new UnsupportedOperationException();
-    }
+    public double getLowPriceLimit() { return this.lowPriceLimit; }
+    public void setLowPriceLimit(double value) { this.lowPriceLimit = value; }
 
-    public long getTimestamp()
-    {
-        throw new UnsupportedOperationException();
-    }
+    public STOP_LOSS_ORDER getStopLoss() { return this.stopLossOrder; }
+    public void setStopLoss(STOP_LOSS_ORDER value) { this.stopLossOrder = value; }
 
-    public int getTransactionNumber()
-    {
-        throw new UnsupportedOperationException();
-    }
+    public TAKE_PROFIT_ORDER getTakeProfit() { return this.takeProfitOrder; }
+    public void setTakeProfit(TAKE_PROFIT_ORDER value) { this.takeProfitOrder = value; }
 
-    public long getUnits()
-    {
-        throw new UnsupportedOperationException();
-    }
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
 
-    public void setHighPriceLimit(double limit)
+    @Override public String toString()
     {
-        throw new UnsupportedOperationException();
-    }
-
-    public void setLowPriceLimit(double limit)
-    {
-        throw new UnsupportedOperationException();
-    }
-
-    public void setPair(PAIR pair)
-    {
-        throw new UnsupportedOperationException();
-    }
-
-    public void setStopLoss(STOP_LOSS_ORDER stoploss)
-    {
-        throw new UnsupportedOperationException();
-    }
-
-    public void setTakeProfit(TAKE_PROFIT_ORDER takeprofit)
-    {
-        throw new UnsupportedOperationException();
-    }
-
-    public void setUnits(long units)
-    {
-        throw new UnsupportedOperationException();
+        return String.format("%s %s @ %s", this.pair, this.units, this.price);
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////

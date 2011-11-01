@@ -51,7 +51,9 @@ public class MESSAGE {
     public class ACCOUNT
     {
         public static final String GET_INFO = "ACCOUNT|get_info|%s|%s";
-        public static final String SET_PROFILE = "USER|set_profile|%s|%s";
+        public static final String SET_PROFILE = "ACCOUNT|set_profile|%s|%s";
+        public static final String EXECUTE_MARKET_ORDER = "ACCOUNT|execute_market_order|%s|%s";
+
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////

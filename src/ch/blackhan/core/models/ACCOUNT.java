@@ -200,9 +200,23 @@ public class ACCOUNT {
         throw new UnsupportedOperationException();
     }
 
-    public void execute(MARKET_ORDER mo) throws FX_EXCEPTION
+    private String serialize(MARKET_ORDER mo)
     {
         throw new UnsupportedOperationException();
+    }
+
+    public void execute(MARKET_ORDER mo) throws FX_EXCEPTION
+    {
+        String req = String.format(MESSAGE.ACCOUNT.EXECUTE_MARKET_ORDER, this.sessionToken,
+            this.serialize(mo));
+        String rep = this.mqm.communicate(req);
+        DefaultTokenizer st = new DefaultTokenizer(rep.substring(req.length()), "|", "None");
+
+        String result = st.nextTokenOrDefault(true);
+        if (result == null || result.compareTo("SESSION_ERROR") == 0)
+        {
+            throw new FX_EXCEPTION(new SESSION_EXCEPTION(this.sessionToken.toString()));
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////
