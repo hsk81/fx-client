@@ -12,9 +12,9 @@ public class FX_EXCEPTION extends Exception {
         super(message);
     }
 
-    public FX_EXCEPTION(FX_EXCEPTION innerExceptions)
+    public FX_EXCEPTION(Exception innerException)
     {
-        super(innerExceptions);
+        super(innerException);
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////
