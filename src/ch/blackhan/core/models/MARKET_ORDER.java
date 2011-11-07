@@ -5,9 +5,9 @@ package ch.blackhan.core.models;
 
 public final class MARKET_ORDER extends ORDER implements Cloneable {
     
-    protected double realizedPL;
-    protected int transactionLink;
-    protected MARKET_ORDER closeOrder;
+    protected double realized_pl;
+    protected int transaction_link;
+    protected MARKET_ORDER close;
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -30,17 +30,17 @@ public final class MARKET_ORDER extends ORDER implements Cloneable {
 
     public MARKET_ORDER getClose()
     {
-        return this.closeOrder;
+        return this.close;
     }
 
     public double getRealizedPL()
     {
-        return this.realizedPL;
+        return this.realized_pl;
     }
 
     public int getTransactionLink() 
     {
-        return this.transactionLink;
+        return this.transaction_link;
     }
 
     public double getUnrealizedPL(TICK tick)

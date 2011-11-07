@@ -7,11 +7,12 @@ import java.util.*;
 
 import ch.blackhan.core.mqm.*;
 import ch.blackhan.core.mqm.util.*;
+import ch.blackhan.representation.*;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-public class PAIR implements Cloneable {
+public class PAIR implements Cloneable, Representable {
 
     protected final MQ_MANAGER mqm = MQ_MANAGER.unique;
     
@@ -129,6 +130,11 @@ public class PAIR implements Cloneable {
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
+
+    @Override public String toRepresentation()
+    {
+        return String.format("\"%s/%s\"", this.quote, this.base);
+    }
 
     @Override public String toString()
     {

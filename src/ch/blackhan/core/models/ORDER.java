@@ -3,11 +3,7 @@ package ch.blackhan.core.models;
 ///////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-import java.util.*;
-import java.lang.reflect.*;
-
 import ch.blackhan.representation.*;
-import ch.blackhan.core.exceptions.*;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -18,72 +14,11 @@ public abstract class ORDER implements Representable {
     protected long units;
     protected double price;
     protected long timestamp;
-    protected double lowPriceLimit;
-    protected double highPriceLimit;
-    protected int transactionNumber;
-    protected TAKE_PROFIT_ORDER takeProfitOrder;
-    protected STOP_LOSS_ORDER stopLossOrder;
-
-    ///////////////////////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////////////////////////////////////////////////////////////
-
-    /**
-     * @INFO: Return JSON; cannot represent circular dependencies!
-     */
-    
-    public String toRepresentation() throws FX_EXCEPTION
-    {
-        StringBuilder sb = new StringBuilder("{");
-        Field[] fields = ORDER.getNonPrivateFields(this.getClass());
-        if (fields.length == 0) return sb.append("}").toString();
-
-        for (Field field : fields)
-        {
-            try {
-                Object value = field.get(this);
-                sb.append(field.getName());
-                sb.append(":");
-                
-                if (value != null)
-                {
-                    sb.append(value instanceof Representable
-                        ? ((Representable)value).toRepresentation() : value.toString()
-                    );
-                }
-                else
-                {
-                    sb.append("null");
-                }
-            } catch (IllegalArgumentException ex) {
-                throw new FX_EXCEPTION(ex);
-            } catch (IllegalAccessException _) {
-                continue; // private field
-            } catch (Exception ex) {
-                throw new FX_EXCEPTION(ex);
-            }
-
-            sb.append(",");
-        }
-
-        return sb.delete(sb.length() - 1, sb.length()).append("}").toString();
-    }
-
-    private static Field[] getNonPrivateFields(Class clazz)
-    {
-        Stack<Class> classes = new Stack<Class>();
-        while (clazz != null)
-        {
-            classes.push(clazz); clazz = clazz.getSuperclass();
-        }
-
-        List<Field> fields = new ArrayList<Field>();
-        while (!classes.empty())
-        {
-            fields.addAll(Arrays.asList(classes.pop().getDeclaredFields()));
-        }
-
-        return fields.toArray(new Field[] {});
-    }
+    protected double low_price_limit;
+    protected double high_price_limit;
+    protected int transaction_number;
+    protected TAKE_PROFIT_ORDER take_profit;
+    protected STOP_LOSS_ORDER stop_loss;
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -104,22 +39,27 @@ public abstract class ORDER implements Representable {
 
     public double getPrice() { return this.price; }
     public long getTimestamp() { return this.timestamp; }
-    public int getTransactionNumber() { return this.transactionNumber; }
+    public int getTransactionNumber() { return this.transaction_number; }
 
-    public double getHighPriceLimit() { return this.highPriceLimit; }
-    public void setHighPriceLimit(double value) { this.highPriceLimit = value; }
+    public double getHighPriceLimit() { return this.high_price_limit; }
+    public void setHighPriceLimit(double value) { this.high_price_limit = value; }
 
-    public double getLowPriceLimit() { return this.lowPriceLimit; }
-    public void setLowPriceLimit(double value) { this.lowPriceLimit = value; }
+    public double getLowPriceLimit() { return this.low_price_limit; }
+    public void setLowPriceLimit(double value) { this.low_price_limit = value; }
 
-    public STOP_LOSS_ORDER getStopLoss() { return this.stopLossOrder; }
-    public void setStopLoss(STOP_LOSS_ORDER value) { this.stopLossOrder = value; }
+    public STOP_LOSS_ORDER getStopLoss() { return this.stop_loss; }
+    public void setStopLoss(STOP_LOSS_ORDER value) { this.stop_loss = value; }
 
-    public TAKE_PROFIT_ORDER getTakeProfit() { return this.takeProfitOrder; }
-    public void setTakeProfit(TAKE_PROFIT_ORDER value) { this.takeProfitOrder = value; }
+    public TAKE_PROFIT_ORDER getTakeProfit() { return this.take_profit; }
+    public void setTakeProfit(TAKE_PROFIT_ORDER value) { this.take_profit = value; }
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
+
+    @Override public String toRepresentation()
+    {
+        return RepresentableUtil.toJson(this);
+    }
 
     @Override public String toString()
     {
