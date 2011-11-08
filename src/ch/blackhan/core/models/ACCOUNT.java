@@ -67,7 +67,7 @@ public class ACCOUNT {
         {
             INFO nfo = new INFO();
 
-            nfo.id = accountId;
+            nfo.id = st.nextLongOrDefault();
             nfo.name = st.nextStringOrDefault();
             nfo.createDate = st.nextLongOrDefault();
             nfo.homeCurrency = st.nextStringOrDefault();
@@ -130,6 +130,8 @@ public class ACCOUNT {
 
     public void setProfile(String profile) throws FX_EXCEPTION
     {
+        if (profile == null) throw new IllegalArgumentException("profile");
+        
         DefaultTokenizer st = this.mqm.talk(
             String.format(MESSAGE.ACCOUNT.SET_PROFILE, this.sessionToken, profile)
         );
