@@ -122,7 +122,7 @@ public class agent implements Observer {
                 }
             }
             
-        } catch (SESSION_EXCEPTION ex) {
+        } catch (FX_EXCEPTION ex) {
             logger.log(Level.SEVERE, null, ex);
         }
 

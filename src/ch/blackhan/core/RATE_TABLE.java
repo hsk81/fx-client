@@ -70,13 +70,10 @@ public class RATE_TABLE {
         throws FX_EXCEPTION
     {
         Vector<HISTORY_POINT> historyPoints = new Vector<HISTORY_POINT>();
-
-        String req = String.format(MESSAGE.RATE_TABLE.GET_HISTORY,
+        
+        DefaultTokenizer st = this.mqm.talk(String.format(MESSAGE.RATE_TABLE.GET_HISTORY,
             pair.getQuote(), pair.getBase(), interval, numTicks
-        );
-
-        String rep = this.mqm.communicate(req);
-        DefaultTokenizer st = new DefaultTokenizer(rep.substring(req.length()), "|", "None");
+        ));
 
         while (st.hasMoreTokens())
         {
@@ -135,9 +132,9 @@ public class RATE_TABLE {
 
     public TICK getRate(PAIR pair) throws RATE_TABLE_EXCEPTION
     {
-        String req = String.format(MESSAGE.RATE_TABLE.GET_RATE,pair.getQuote(), pair.getBase());
-        String rep = this.mqm.communicate(req);
-        DefaultTokenizer st = new DefaultTokenizer(rep.substring(req.length()), "|", "None");
+        DefaultTokenizer st = this.mqm.talk(
+            String.format(MESSAGE.RATE_TABLE.GET_RATE, pair.getQuote(), pair.getBase())
+        );
 
         return new TICK(
             st.nextLongOrDefault(),
@@ -162,9 +159,9 @@ public class RATE_TABLE {
             logger.log(Level.SEVERE, null, ex);
         }
 
-        String req = String.format(MESSAGE.RATE_TABLE.LOGGED_IN, hostAddress);
-        String rep = this.mqm.communicate(req);
-        DefaultTokenizer st = new DefaultTokenizer(rep.substring(req.length()), "|", "None");
+        DefaultTokenizer st = this.mqm.talk(
+            String.format(MESSAGE.RATE_TABLE.LOGGED_IN, hostAddress)
+        );
 
         return st.nextBooleanOrDefault();
     }

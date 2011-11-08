@@ -118,11 +118,8 @@ public class PAIR implements Cloneable, Representable {
 
     public boolean isHalted()
     {
-        String req_message = String.format(MESSAGE.PAIR.GET_HALTED, this.quote, this.base);
-        String rep_message = this.mqm.communicate(req_message);
-
-        StringTokenizer st = new StringTokenizer(
-            rep_message.substring(req_message.length()), "|"
+        StringTokenizer st = this.mqm.talk(
+            String.format(MESSAGE.PAIR.GET_HALTED, this.quote, this.base)
         );
 
         return Boolean.parseBoolean(st.nextToken());

@@ -55,15 +55,9 @@ public class CLIENT extends Observable {
     {
         synchronized (this)
         {
-            String req = String.format(
+            DefaultTokenizer st = this.mqm.talk(String.format(
                 MESSAGE.CLIENT.LOGIN, username, password, getHostAddress()
-            );
-
-            String rep = this.mqm.communicate(req);
-
-            DefaultTokenizer st = new DefaultTokenizer(rep.substring(
-                req.length()), "|", "None"
-            );
+            ));
 
             String result = st.nextTokenOrDefault(false);
             if (result == null || result.compareTo("SESSION_ERROR") == 0)
@@ -125,7 +119,7 @@ public class CLIENT extends Observable {
 
                 CLIENT.keep_alive_thread = null;
 
-                this.mqm.communicate(String.format(
+                this.mqm.talk(String.format(
                     MESSAGE.CLIENT.LOGOUT, this.user.getSessionToken()
                 ));
 
@@ -215,11 +209,7 @@ public class CLIENT extends Observable {
 
     public Long getServerTime()
     {
-        String req = String.format(MESSAGE.CLIENT.GET_SERVER_TIME);
-        String rep = this.mqm.communicate(req);
-        DefaultTokenizer st = new DefaultTokenizer(rep.substring(req.length()), "|", "None");
-
-        return st.nextLongOrDefault();
+        return this.mqm.talk(MESSAGE.CLIENT.GET_SERVER_TIME).nextLongOrDefault();
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////

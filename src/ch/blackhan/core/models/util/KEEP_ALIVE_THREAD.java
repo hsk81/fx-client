@@ -48,14 +48,10 @@ public final class KEEP_ALIVE_THREAD extends Thread {
         {
             while (true)
             {
-                String rep = this.mqm.communicate(req, timeout);
-                if (rep != null)
+                DefaultTokenizer tokenizer = this.mqm.talk(req, timeout);
+                if (tokenizer != null)
                 {
-                    DefaultTokenizer st = new DefaultTokenizer(
-                        rep.substring(req.length()), "|", "None"
-                    );
-
-                    String result = st.nextStringOrDefault();
+                    String result = tokenizer.nextStringOrDefault();
                     if (result == null || result.compareTo("SESSION_ERROR") == 0)
                     {
                         logger.log(Level.SEVERE, result);

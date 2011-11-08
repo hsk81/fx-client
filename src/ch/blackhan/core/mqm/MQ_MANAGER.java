@@ -3,7 +3,9 @@ package ch.blackhan.core.mqm;
 ///////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
+import ch.blackhan.*;
 import ch.blackhan.core.mqm.exception.*;
+
 import org.zeromq.ZMQ;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -58,6 +60,46 @@ public class MQ_MANAGER {
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
 
+    public DefaultTokenizer talk(String req_message)
+    {
+        return this.talk(req_message, this.timeout);
+    }
+
+    public DefaultTokenizer talk(String req_message, long timeout)
+    {
+        return this.talk(req_message, timeout, "|");
+    }
+
+    public DefaultTokenizer talk(String req_message, long timeout, String delimiter)
+    {
+        return this.talk(req_message, timeout, delimiter, "None");
+    }
+
+    public DefaultTokenizer talk(String req_message, long timeout, String delimiter,
+        String default_value)
+    {
+        return this.talk(req_message, timeout, delimiter, default_value, 0);
+    }
+
+    public DefaultTokenizer talk(String req_message, long timeout, String delimiter,
+        String default_value, int start_index) // [microsecs]
+    {
+        String rep_message = this.communicate(req_message, timeout);
+        if (rep_message != null)
+        {
+            return new DefaultTokenizer(
+                rep_message.substring(start_index), delimiter, default_value
+            );
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
+
     public String communicate(String req_message)
     {
         return this.communicate(req_message, this.timeout);
@@ -73,24 +115,15 @@ public class MQ_MANAGER {
                 if (bytes != null)
                 {
                     String rep_message = new String(bytes);
-                    if (rep_message.startsWith(req_message))
+                    if (rep_message.startsWith("EXCEPTION"))
                     {
-                        return rep_message;
+                        throw new AssertionError(
+                            new SERVER_EXCEPTION(rep_message)
+                        );
                     }
                     else
                     {
-                        if (rep_message.startsWith("EXCEPTION"))
-                        {
-                            throw new AssertionError(
-                                new SERVER_EXCEPTION(rep_message)
-                            );
-                        }
-                        else
-                        {
-                            throw new AssertionError(
-                                new RESPONSE_EXCEPTION(rep_message)
-                            );
-                        }
+                        return rep_message;
                     }
                 }
                 else

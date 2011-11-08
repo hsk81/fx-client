@@ -19,8 +19,7 @@ public class DefaultTokenizer extends StringTokenizer {
 
     public DefaultTokenizer(String str, String delim, String defaultToken)
     {
-        super (str, delim);
-        this.defaultToken = defaultToken;
+        super (str, delim); this.defaultToken = defaultToken;
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -76,38 +75,32 @@ public class DefaultTokenizer extends StringTokenizer {
 
     public Boolean nextBooleanOrDefault()
     {
-        return this.nextTokenOrDefault() != null
-            ? Boolean.parseBoolean(this.lastToken) : null;
+        return this.nextTokenOrDefault() != null ? Boolean.parseBoolean(this.lastToken) : null;
     }
 
     public Short nextShortOrDefault()
     {
-        return this.nextTokenOrDefault() != null
-            ? Short.parseShort(this.lastToken) : null;
+        return this.nextTokenOrDefault() != null ? Short.parseShort(this.lastToken) : null;
     }
 
     public Integer nextIntegerOrDefault()
     {
-        return this.nextTokenOrDefault() != null
-            ? Integer.parseInt(this.lastToken) : null;
+        return this.nextTokenOrDefault() != null ? Integer.parseInt(this.lastToken) : null;
     }
 
     public Long nextLongOrDefault()
     {
-        return this.nextTokenOrDefault() != null
-            ? Long.parseLong(this.lastToken) : null;
+        return this.nextTokenOrDefault() != null ? Long.parseLong(this.lastToken) : null;
     }
 
     public Double nextDoubleOrDefault()
     {
-        return this.nextTokenOrDefault() != null
-            ? Double.parseDouble(this.lastToken) : null;
+        return this.nextTokenOrDefault() != null ? Double.parseDouble(this.lastToken) : null;
     }
 
     public String nextStringOrDefault()
     {
-        return this.nextTokenOrDefault() != null
-            ? this.lastToken : null;
+        return this.nextTokenOrDefault() != null ? this.lastToken : null;
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////

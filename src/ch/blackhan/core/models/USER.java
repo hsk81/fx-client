@@ -52,9 +52,9 @@ public class USER {
 
     private INFO getInfo() throws SESSION_EXCEPTION
     {
-        String req = String.format(MESSAGE.USER.GET_INFO, this.sessionToken);
-        String rep = this.mqm.communicate(req);
-        DefaultTokenizer st = new DefaultTokenizer(rep.substring(req.length()), "|", "None");
+        DefaultTokenizer st = this.mqm.talk(
+            String.format(MESSAGE.USER.GET_INFO, this.sessionToken)
+        );
 
         String result = st.nextTokenOrDefault(true);
         if (result == null || result.compareTo("SESSION_ERROR") == 0)
@@ -82,11 +82,11 @@ public class USER {
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    public Vector<ACCOUNT> getAccounts() throws SESSION_EXCEPTION
+    public Vector<ACCOUNT> getAccounts() throws FX_EXCEPTION
     {
-        String req = String.format(MESSAGE.USER.GET_ACCOUNTS, this.sessionToken);
-        String rep = this.mqm.communicate(req);
-        DefaultTokenizer st = new DefaultTokenizer(rep.substring(req.length()), "|", "None");
+        DefaultTokenizer st = this.mqm.talk(
+            String.format(MESSAGE.USER.GET_ACCOUNTS, this.sessionToken)
+        );
 
         String result = st.nextTokenOrDefault(true);
         if (result == null || result.compareTo("SESSION_ERROR") == 0)
@@ -108,13 +108,13 @@ public class USER {
         }
     }
 
-    public ACCOUNT getAccountWithId(int accountId) throws SESSION_EXCEPTION, ACCOUNT_EXCEPTION
+    public ACCOUNT getAccountWithId(int accountId) throws FX_EXCEPTION, ACCOUNT_EXCEPTION
     {
         if (accountId <= 0) throw new IllegalArgumentException("accountId");
 
-        String req = String.format(MESSAGE.USER.GET_ACCOUNT, this.sessionToken, accountId);
-        String rep = this.mqm.communicate(req);
-        DefaultTokenizer st = new DefaultTokenizer(rep.substring(req.length()), "|", "None");
+        DefaultTokenizer st = this.mqm.talk(
+            String.format(MESSAGE.USER.GET_ACCOUNT, this.sessionToken, accountId)
+        );
 
         String result = st.nextTokenOrDefault(true);
         if (result == null || result.compareTo("SESSION_ERROR") == 0)
@@ -187,9 +187,9 @@ public class USER {
     {
         if (profile == null) throw new IllegalArgumentException("profile");
 
-        String req = String.format(MESSAGE.USER.SET_PROFILE, this.sessionToken, profile);
-        String rep = this.mqm.communicate(req);
-        DefaultTokenizer st = new DefaultTokenizer(rep.substring(req.length()), "|", "None");
+        DefaultTokenizer st = this.mqm.talk(
+            String.format(MESSAGE.USER.SET_PROFILE, this.sessionToken, profile)
+        );
 
         String result = st.nextTokenOrDefault(true);
         if (result == null || result.compareTo("SESSION_ERROR") == 0)

@@ -38,7 +38,7 @@ public class ACCOUNT {
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    public ACCOUNT(UUID sessionToken, long accountId) throws SESSION_EXCEPTION
+    public ACCOUNT(UUID sessionToken, long accountId) throws FX_EXCEPTION
     {
         if (sessionToken == null) throw new IllegalArgumentException("sessionToken");
         if (accountId <= 0) throw new IllegalArgumentException("accountId");
@@ -50,13 +50,13 @@ public class ACCOUNT {
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    private INFO getInfo(long accountId) throws SESSION_EXCEPTION
+    private INFO getInfo(long accountId) throws FX_EXCEPTION
     {
         if (accountId <= 0) throw new IllegalArgumentException("accountId");
 
-        String req = String.format(MESSAGE.ACCOUNT.GET_INFO, this.sessionToken, accountId);
-        String rep = this.mqm.communicate(req);
-        DefaultTokenizer st = new DefaultTokenizer(rep.substring(req.length()), "|", "None");
+        DefaultTokenizer st = this.mqm.talk(
+            String.format(MESSAGE.ACCOUNT.GET_INFO, this.sessionToken, accountId)
+        );
 
         String result = st.nextTokenOrDefault(true);
         if (result == null || result.compareTo("SESSION_ERROR") == 0)
@@ -128,13 +128,11 @@ public class ACCOUNT {
         return this.info.profile;
     }
 
-    public void setProfile(String profile) throws SESSION_EXCEPTION
+    public void setProfile(String profile) throws FX_EXCEPTION
     {
-        if (profile == null) throw new IllegalArgumentException("profile");
-
-        String req = String.format(MESSAGE.ACCOUNT.SET_PROFILE, this.sessionToken, profile);
-        String rep = this.mqm.communicate(req);
-        DefaultTokenizer st = new DefaultTokenizer(rep.substring(req.length()), "|", "None");
+        DefaultTokenizer st = this.mqm.talk(
+            String.format(MESSAGE.ACCOUNT.SET_PROFILE, this.sessionToken, profile)
+        );
 
         String result = st.nextTokenOrDefault(true);
         if (result == null || result.compareTo("SESSION_ERROR") == 0)
@@ -202,14 +200,14 @@ public class ACCOUNT {
 
     public void execute(MARKET_ORDER mo) throws FX_EXCEPTION
     {
-        String req = String.format(MESSAGE.ACCOUNT.EXECUTE_MARKET_ORDER, this.sessionToken,
-            this.getAccountId(), mo.toRepresentation());
-        String rep = this.mqm.communicate(req);
-        
-        DefaultTokenizer st = new DefaultTokenizer(rep.substring(req.length()), "|", "None");
+        DefaultTokenizer st = this.mqm.talk(String.format(MESSAGE.ACCOUNT.EXECUTE_MARKET_ORDER,
+            this.sessionToken, this.getAccountId(), mo.toRepresentation()
+        ));
+
         String result = st.nextTokenOrDefault(true);
-        if (result == null || result.compareTo("SESSION_ERROR") == 0) {
-            throw new FX_EXCEPTION(new SESSION_EXCEPTION(this.sessionToken.toString()));
+        if (result == null || result.compareTo("SESSION_ERROR") == 0)
+        {
+            throw new SESSION_EXCEPTION(this.sessionToken.toString());
         }
     }
 
