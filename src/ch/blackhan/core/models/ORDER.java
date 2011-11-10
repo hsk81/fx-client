@@ -10,13 +10,14 @@ import ch.blackhan.representation.*;
 
 public abstract class ORDER implements Representable {
     
+    private long timestamp;
+    private int transaction_number;
+
     protected PAIR pair;
     protected long units;
     protected double price;
-    protected long timestamp;
     protected double low_price_limit;
     protected double high_price_limit;
-    protected int transaction_number;
     protected TAKE_PROFIT_ORDER take_profit;
     protected STOP_LOSS_ORDER stop_loss;
 
@@ -38,8 +39,6 @@ public abstract class ORDER implements Representable {
     public void setUnits(long value) { this.units = value; }
 
     public double getPrice() { return this.price; }
-    public long getTimestamp() { return this.timestamp; }
-    public int getTransactionNumber() { return this.transaction_number; }
 
     public double getHighPriceLimit() { return this.high_price_limit; }
     public void setHighPriceLimit(double value) { this.high_price_limit = value; }
@@ -51,7 +50,10 @@ public abstract class ORDER implements Representable {
     public void setStopLoss(STOP_LOSS_ORDER value) { this.stop_loss = value; }
 
     public TAKE_PROFIT_ORDER getTakeProfit() { return this.take_profit; }
-    public void setTakeProfit(TAKE_PROFIT_ORDER value) { this.take_profit = value; }
+    public void setTakeProfit(TAKE_PROFIT_ORDER value) { this.take_profit = null; } //TODO!
+
+    public long getTimestamp() { return this.timestamp; }
+    public int getTransactionNumber() { return this.transaction_number; }
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////

@@ -211,6 +211,10 @@ public class ACCOUNT {
         {
             throw new SESSION_EXCEPTION(this.sessionToken.toString());
         }
+        else
+        {
+            // TODO: Update mo, mo.take_profit, mo.stop_loss and mo.close?
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////

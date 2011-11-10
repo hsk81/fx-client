@@ -130,7 +130,7 @@ public class PAIR implements Cloneable, Representable {
 
     @Override public String toRepresentation()
     {
-        return String.format("\"%s/%s\"", this.quote, this.base);
+        return String.format("{\"quote\":\"%s\",\"base\":\"%s\"}", this.quote, this.base);
     }
 
     @Override public String toString()

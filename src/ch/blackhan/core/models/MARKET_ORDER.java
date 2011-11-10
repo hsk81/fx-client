@@ -5,8 +5,9 @@ package ch.blackhan.core.models;
 
 public final class MARKET_ORDER extends ORDER implements Cloneable {
     
-    protected double realized_pl;
-    protected int transaction_link;
+    private int transaction_link;
+    private double realized_pl;
+
     protected MARKET_ORDER close;
 
     ///////////////////////////////////////////////////////////////////////////////////////////
