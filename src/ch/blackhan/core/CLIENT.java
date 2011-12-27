@@ -112,7 +112,7 @@ public class CLIENT extends Observable {
         {
             if (this.user != null)
             {
-                while (CLIENT.keep_alive_thread.isAlive())
+                while (CLIENT.keep_alive_thread != null && CLIENT.keep_alive_thread.isAlive())
                 {
                     CLIENT.keep_alive_thread.interrupt();
                 }

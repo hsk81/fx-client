@@ -54,8 +54,8 @@ public class TPEvent extends RATE_EVENT
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    public TPEvent(ACCOUNT account, Direction direction,
-        PAIR pair_st, PAIR pair_nd, PAIR pair_rd)
+    public TPEvent(ACCOUNT account, Direction direction, PAIR pair_st, PAIR pair_nd,
+        PAIR pair_rd)
     {
         if (account == null) throw new IllegalArgumentException("account");
         if (pair_st == null) throw new IllegalArgumentException("pair_st");
@@ -63,12 +63,11 @@ public class TPEvent extends RATE_EVENT
         if (pair_rd == null) throw new IllegalArgumentException("pair_rd");
 
         this.account = account;
+        this.direction = direction;
         
         this.pair_st = pair_st; this.st_time = System.nanoTime();
         this.pair_nd = pair_nd; this.nd_time = System.nanoTime();
         this.pair_rd = pair_rd; this.rd_time = System.nanoTime();
-        
-        this.direction = direction;
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////
