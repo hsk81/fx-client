@@ -47,7 +47,7 @@ public abstract class ORDER implements Representable {
     public void setLowPriceLimit(double value) { this.low_price_limit = value; }
 
     public STOP_LOSS_ORDER getStopLoss() { return this.stop_loss; }
-    public void setStopLoss(STOP_LOSS_ORDER value) { this.stop_loss = value; }
+    public void setStopLoss(STOP_LOSS_ORDER value) { this.stop_loss = null; } //TODO!
 
     public TAKE_PROFIT_ORDER getTakeProfit() { return this.take_profit; }
     public void setTakeProfit(TAKE_PROFIT_ORDER value) { this.take_profit = null; } //TODO!

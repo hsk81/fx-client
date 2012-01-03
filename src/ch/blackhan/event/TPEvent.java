@@ -248,8 +248,12 @@ public class TPEvent extends RATE_EVENT
         }
         catch (FX_EXCEPTION ex)
         {
+            synchronized (this) 
+            {
+                em.remove(this);
+            }
+            
             logger.log(Level.SEVERE, null, ex);
-            synchronized (this) { em.remove(this); }
         }
     }
 
