@@ -69,6 +69,9 @@ public final class RATE_EVENT_MANAGER extends EVENT_MANAGER {
                 new String(this.subSocket.recv(0)), "|"
             );
 
+            //UUID uuid = UUID.fromString(st.nextToken());
+            //assert(uuid != null);
+
             RATE_EVENT_INFO rei = new RATE_EVENT_INFO(
                 this.getPair(st.nextToken()), new TICK(
                     Long.parseLong(st.nextToken()),
