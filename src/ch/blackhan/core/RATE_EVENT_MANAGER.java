@@ -65,15 +65,15 @@ public final class RATE_EVENT_MANAGER extends EVENT_MANAGER {
 
         while (true)
         {
-            StringTokenizer st = new StringTokenizer(
-                new String(this.subSocket.recv(0)), "|"
-            );
-
-            //UUID uuid = UUID.fromString(st.nextToken());
-            //assert(uuid != null);
+            PAIR pair = this.getPair(new String(this.subSocket.recv(0)));
+            assert(pair != null);
+            UUID uuid = UUID.fromString(new String(this.subSocket.recv(0)));
+            assert(uuid != null);
+            StringTokenizer st = new StringTokenizer(new String(this.subSocket.recv(0)), "|");
+            assert(st != null && st.hasMoreTokens());
 
             RATE_EVENT_INFO rei = new RATE_EVENT_INFO(
-                this.getPair(st.nextToken()), new TICK(
+                pair, new TICK(
                     Long.parseLong(st.nextToken()),
                     Double.parseDouble(st.nextToken()),
                     Double.parseDouble(st.nextToken())
