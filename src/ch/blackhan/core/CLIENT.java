@@ -162,7 +162,6 @@ public class CLIENT extends Observable {
     public void setProxy(boolean state)
     {
         this.mqm.setRequestorPort(state ? 80 : MQ_MANAGER.requestorPort);
-        this.mqm.setSubscriberPort(state ? 81 : MQ_MANAGER.subscriberPort);
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////
