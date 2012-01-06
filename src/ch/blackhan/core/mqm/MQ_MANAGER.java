@@ -3,6 +3,8 @@ package ch.blackhan.core.mqm;
 ///////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
+import java.util.*;
+
 import ch.blackhan.*;
 import ch.blackhan.core.mqm.exception.*;
 
@@ -53,7 +55,38 @@ public class MQ_MANAGER {
     ///////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    public long timeout = -1L; // indefinite [microsecs]
+    /**
+     * Universally unique identification of the logical *server side* counter party; *not* the
+     * identification of another client but either the id of a simulator (for the GAME client)
+     * or the id of an actual price matching engine (for the TRADE client).
+     */
+
+    private byte[] uuid = "00000000-0000-0000-0000-000000000000".getBytes();
+
+    public void setUuid(UUID uuid)
+    {
+        synchronized (this)
+        {
+            if (uuid == null)
+            {
+                this.uuid = "00000000-0000-0000-0000-000000000000".getBytes();
+            }
+            else
+            {
+                this.uuid = uuid.toString().getBytes();
+            }
+        }
+    }
+
+    public UUID getUuid()
+    {
+        return UUID.fromString(this.uuid.toString());
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
+
+    private long timeout = -1L; // indefinite [microsecs]
     public long getTimeout() { return this.timeout; }
     public void setTimeout(long timeout) { this.timeout = timeout; }
 
@@ -191,7 +224,7 @@ public class MQ_MANAGER {
         return MQ_MANAGER.reqSocket.get();
     }
 
-    private ZMQ.Socket setRequestorUri(String uri)
+    public ZMQ.Socket setRequestorUri(String uri)
     {
         if (this.reqSocketUri.compareTo(uri) != 0)
         {
@@ -205,7 +238,7 @@ public class MQ_MANAGER {
         return this.getRequestor();
     }
 
-    private ZMQ.Socket setRequestorHostAndPort(String host, long port)
+    public ZMQ.Socket setRequestorHostAndPort(String host, long port)
     {
         return this.setRequestorUri(String.format("%s:%d", host, port));
     }
@@ -229,7 +262,7 @@ public class MQ_MANAGER {
         return MQ_MANAGER.subSocket.get();
     }
 
-    private ZMQ.Socket setSubscriberUri(String uri)
+    public ZMQ.Socket setSubscriberUri(String uri)
     {
         if (this.subSocketUri.compareTo(uri) != 0)
         {
@@ -242,7 +275,7 @@ public class MQ_MANAGER {
         return this.getSubscriber();
     }
 
-    private ZMQ.Socket setSubscriberHostAndPort(String host, long port)
+    public ZMQ.Socket setSubscriberHostAndPort(String host, long port)
     {
         return this.setSubscriberUri(String.format("%s:%d", host, port));
     }

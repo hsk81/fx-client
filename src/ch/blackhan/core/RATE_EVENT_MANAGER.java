@@ -56,7 +56,7 @@ public final class RATE_EVENT_MANAGER extends EVENT_MANAGER {
     {
         this.subSocket = this.mqm.getSubscriber();
         
-        this.subSocket.subscribe("EUR/USD".getBytes());
+        this.subSocket.subscribe("EUR/USD".getBytes()); //@TODO: Enable other pairs!
         this.subSocket.subscribe("USD/CHF".getBytes());
         this.subSocket.subscribe("EUR/CHF".getBytes());
 
@@ -67,18 +67,18 @@ public final class RATE_EVENT_MANAGER extends EVENT_MANAGER {
         {
             PAIR pair = this.getPair(new String(this.subSocket.recv(0)));
             assert(pair != null);
+            
             UUID uuid = UUID.fromString(new String(this.subSocket.recv(0)));
             assert(uuid != null);
+
             StringTokenizer st = new StringTokenizer(new String(this.subSocket.recv(0)), "|");
             assert(st != null && st.hasMoreTokens());
 
-            RATE_EVENT_INFO rei = new RATE_EVENT_INFO(
-                pair, new TICK(
-                    Long.parseLong(st.nextToken()),
-                    Double.parseDouble(st.nextToken()),
-                    Double.parseDouble(st.nextToken())
-                )
-            );
+            RATE_EVENT_INFO rei = new RATE_EVENT_INFO(pair, new TICK(
+                Long.parseLong(st.nextToken()),
+                Double.parseDouble(st.nextToken()),
+                Double.parseDouble(st.nextToken())
+            ));
 
             logger.log(Level.INFO, rei.toString());
             index = 0; while (true)
@@ -99,6 +99,7 @@ public final class RATE_EVENT_MANAGER extends EVENT_MANAGER {
                 {
                     if (event.match(rei))
                     {
+                        this.mqm.setUuid(uuid);
                         event.handle(rei, this);
                     }
                 }
